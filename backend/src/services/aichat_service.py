@@ -1,6 +1,5 @@
 from openai import OpenAI
 import os
-from sse_starlette import EventSourceResponseapp
 
 
 client = OpenAI(
@@ -14,7 +13,8 @@ class aichatservice:
     def aichat():
         completion = client.chat.completions.create(
             model="nvidia/llama-3.3-nemotron-super-49b-v1",
-            messages=[{"role": "user", "content": "does god exists?"}],
+            # messages=[{"role": "user", "content": "does god exists?"}],
+            messages=[{"role": "user", "content": "what is  1+ 2 ?"}],
             temperature=0.6,
             top_p=0.95,
             max_tokens=4096,
@@ -24,6 +24,8 @@ class aichatservice:
         )
 
         for chunk in completion:
+            print("---- NEW CHUNK ----")
+            print(chunk)  # This will show you the actual chunk object
             if chunk.choices[0].delta.content is not None:
                 # print(chunk.choices[0].delta.content, end="")
-                return chunk.choices[0].delta.content
+                yield chunk.choices[0].delta.content

@@ -1,16 +1,15 @@
-from dotenv import load_dotenv
+from .configs.env_config import load_dotenv
 from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 import os
 
-from .routes.aichatsroutes import router as aichatsroutes
+from .routes.aichats_routes import router as aichatsroutes
 
 
 @asynccontextmanager
 async def onstartupandshutdown():
     """on startup"""
-    _ = load_dotenv()
     yield
     """ on shutdown """
 
