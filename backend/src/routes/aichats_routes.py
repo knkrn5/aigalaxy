@@ -7,7 +7,7 @@ from ..services.aichat_service import aichatservice
 router = APIRouter()
 
 
-@router.get("/aichatres")
+@router.get("/aichat-res")
 def aichat():
     res = aichatservice.aichat()
     # return StreamingResponse(res, media_type="text/plain")

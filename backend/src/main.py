@@ -1,8 +1,6 @@
 from .configs.env_config import load_dotenv
 from contextlib import asynccontextmanager
-import uvicorn
 from fastapi import FastAPI
-import os
 
 from .routes.aichats_routes import router as aichatsroutes
 
