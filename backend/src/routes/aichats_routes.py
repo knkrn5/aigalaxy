@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from fastapi.responses import StreamingResponse
 
 from ..services.aichat_service import aichatservice
@@ -7,8 +7,8 @@ from ..services.aichat_service import aichatservice
 router = APIRouter()
 
 
-@router.get("/aichat-res")
-def aichat():
-    res = aichatservice.aichat()
+@router.post("/aichat-res")
+def aichat(question: str = Body(embed=True)):
+    res = aichatservice.aichat(question)
     # return StreamingResponse(res, media_type="text/plain")
-    return StreamingResponse(res, media_type="application/json")
+    return StreamingResponse(res, media_type="text/event-stream")

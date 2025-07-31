@@ -10,10 +10,13 @@ client = OpenAI(
 
 class aichatservice:
     @staticmethod
-    def aichat():
+    def aichat(question: str):
+        if not question:
+            raise ValueError("Question cannot be empty")
+            
         completion = client.chat.completions.create(
             model="nvidia/llama-3.3-nemotron-super-49b-v1",
-            messages=[{"role": "user", "content": "what is  1+ 2 ?"}],
+            messages=[{"role": "user", "content": question}],
             temperature=0.6,
             top_p=0.95,
             max_tokens=4096,

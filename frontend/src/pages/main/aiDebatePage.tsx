@@ -1,25 +1,35 @@
-import { useEffect, useState } from "react";
-import { HiOutlineLightBulb } from "react-icons/hi";
+import { useState } from "react";
+import { IoIosSend } from "react-icons/io";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function AiDebatePage() {
   const [aiResponse, setAIResponse] = useState<string>("");
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [inputvalue, setinputvalue] = useState<string>("");
 
-  const handleGetAIResponse = () => {
-    // Placeholder for AI response logic
-    fetch(`${BACKEND_URL}/aichats/aichat-res`)
+  const handleGetAIResponse = (inputvalue: string) => {
+    if (!inputvalue.trim()) {
+      setAIResponse("Please enter a valid question.");
+      return;
+    }
+    setIsFetching(true);
+    fetch(`${BACKEND_URL}/aichats/aichat-res`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: inputvalue }),
+    })
       .then((response) => response.text())
       .then((data) => {
         setAIResponse(data);
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   };
-
-  console.log(aiResponse);
-
-  useEffect(() => {
-    handleGetAIResponse();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-6">
@@ -37,21 +47,35 @@ export default function AiDebatePage() {
         {/* Main Content Card */}
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20 mb-8">
           <div className="mb-8">
+            {/* input field */}
+            <input
+              type="text"
+              placeholder="Ask a question"
+              className="w-full bg-transparent mb-5 border border-white/20 shadow-2xl shadow-amber-50 px-4 py-2 rounded-full"
+              value={inputvalue}
+              onChange={(e) => setinputvalue(e.target.value)}
+            />
+
             <button
               title="get ai response"
               type="button"
-              className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer"
-              onClick={() => alert("AI response triggered")}
+              disabled={isFetching}
+              className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer disabled:cursor-not-allowed transition-transform hover:scale-105 active:scale-95"
+              onClick={() => handleGetAIResponse(inputvalue)}
             >
-              <HiOutlineLightBulb className="w-10 h-10 text-white" />
+              <IoIosSend size={32} className="w-10 h-10 text-white" />
             </button>
 
-            <p className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl mx-auto">
-              {!aiResponse
-                ? `Welcome to AI Galaxy where artificial intelligence meets human
+            {isFetching ? (
+              <AiOutlineLoading3Quarters className="w-10 h-10 mx-auto text-white animate-spin" />
+            ) : (
+              <p className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl mx-auto">
+                {!aiResponse
+                  ? `Welcome to AI Galaxy where artificial intelligence meets human
               curiosity in the ultimate debate arena. `
-                : aiResponse}
-            </p>
+                  : aiResponse}
+              </p>
+            )}
           </div>
 
           {/* Call to Action Button */}
