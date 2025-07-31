@@ -23,6 +23,6 @@ class aichatservice:
         )
 
         for chunk in completion:
-            print(chunk, end="\n\n")
+            # print(chunk, end="\n\n")
             if chunk.choices[0].delta.content is not None:
                 yield chunk.choices[0].delta.content

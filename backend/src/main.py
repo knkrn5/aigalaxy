@@ -1,8 +1,13 @@
 from .configs.env_config import load_dotenv
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 from .routes.aichats_routes import router as aichatsroutes
+
+
+origins = [
+    "http://localhost:5173",
+]
 
 
 @asynccontextmanager
@@ -16,6 +21,14 @@ app = FastAPI(
     title="FastAPI Example",
     description="A simple FastAPI application with startup and shutdown events.",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
