@@ -38,12 +38,3 @@ def read_root():
 
 
 app.include_router(aichatsroutes, prefix="/aichats", tags=["AI Chat"])
-
-
-# def main():
-#     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 9000)), reload=True)
-#     print(f"Server is running at http://localhost:{os.getenv('PORT', 9000)}")
-
-
-# if __name__ == "__main__":
-#     main()

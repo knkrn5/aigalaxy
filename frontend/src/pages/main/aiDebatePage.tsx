@@ -14,21 +14,44 @@ export default function AiDebatePage() {
       setAIResponse("Please enter a valid question.");
       return;
     }
+    
+    setAIResponse("");
     setIsFetching(true);
-    fetch(`${BACKEND_URL}/aichats/aichat-res`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question: inputvalue }),
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        setAIResponse(data);
-      })
-      .finally(() => {
+
+    //   fetch(`${BACKEND_URL}/aichats/aichat-res`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ question: inputvalue }),
+    //   })
+    //     .then((response) => response.text())
+    //     .then((data) => {
+    //       setAIResponse(data);
+    //     })
+    //     .finally(() => {
+    //       setIsFetching(false);
+    //     });
+
+    const encodedQuestion = encodeURIComponent(inputvalue);
+    const eventSource = new EventSource(
+      `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
+    );
+
+    eventSource.onmessage = (event) => {
+      if (event.data === "[END]") {
+        eventSource.close();
         setIsFetching(false);
-      });
+        return;
+      }
+      setAIResponse((prev) => prev + event.data);
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE error:", error);
+      eventSource.close(); // always close on error
+      setIsFetching(false);
+    };
   };
 
   return (
@@ -61,7 +84,7 @@ export default function AiDebatePage() {
               type="button"
               disabled={isFetching}
               className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer disabled:cursor-not-allowed transition-transform hover:scale-105 active:scale-95"
-              onClick={() => handleGetAIResponse(inputvalue)}
+                onClick={() => handleGetAIResponse(inputvalue)}
             >
               <IoIosSend size={32} className="w-10 h-10 text-white" />
             </button>

@@ -1,5 +1,6 @@
 from openai import OpenAI
 import os
+import asyncio
 
 
 client = OpenAI(
@@ -10,7 +11,7 @@ client = OpenAI(
 
 class aichatservice:
     @staticmethod
-    def aichat(question: str):
+    async def aichat(question: str):
         if not question:
             raise ValueError("Question cannot be empty")
             
@@ -28,4 +29,7 @@ class aichatservice:
         for chunk in completion:
             # print(chunk, end="\n\n")
             if chunk.choices[0].delta.content is not None:
-                yield chunk.choices[0].delta.content
+                yield f"data: {chunk.choices[0].delta.content}\n\n"
+                await asyncio.sleep(0.01)
+
+        yield "data: [END]\n\n"
