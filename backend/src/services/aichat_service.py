@@ -11,7 +11,7 @@ client = OpenAI(
 
 class aichatservice:
     @staticmethod
-    async def aichat(question: str):
+    def aichat(question: str):
         if not question:
             raise ValueError("Question cannot be empty")
             
@@ -30,6 +30,6 @@ class aichatservice:
             # print(chunk, end="\n\n")
             if chunk.choices[0].delta.content is not None:
                 yield f"data: {chunk.choices[0].delta.content}\n\n"
-                await asyncio.sleep(0.01)
+                # await asyncio.sleep(0.01)
 
         yield "data: [END]\n\n"
