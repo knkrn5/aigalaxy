@@ -71,7 +71,7 @@ export default function AiDebatePage() {
               className="w-full bg-transparent mb-5 border border-white/20 shadow-2xl shadow-amber-50 px-4 py-2 rounded-full text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50"
               value={inputvalue}
               onChange={(e) => setinputvalue(e.target.value)}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter' && !isFetching && inputvalue.trim()) {
                   handleGetAIResponse(inputvalue);
                 }
