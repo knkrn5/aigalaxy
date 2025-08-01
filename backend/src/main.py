@@ -3,10 +3,16 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes.aichats_routes import router as aichatsroutes
+import os
+
+is_production = os.getenv("ENV") == "PRODUCTION"
+print(is_production)
 
 
 origins = [
     "http://localhost:5173",
+] if not is_production else [
+    "https://your-production-domain.com",
 ]
 
 
@@ -35,6 +41,11 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+@app.get("/health")
+def read_health():
+    return {"status": "healthy"}
 
 
 app.include_router(aichatsroutes, prefix="/aichats", tags=["AI Chat"])
