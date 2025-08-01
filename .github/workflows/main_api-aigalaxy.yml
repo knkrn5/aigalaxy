@@ -24,24 +24,21 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Create and activate virtual environment
+      - name: Create and start virtual environment
+        working-directory: ./backend
         run: |
-          python -m venv backend/venv
-          source backend/venv/bin/activate
-        shell: bash
+          python -m venv venv
+          source venv/bin/activate
 
       - name: Install dependencies
-        run: |
-          pip install -r backend/requirements.txt
-        shell: bash
+        working-directory: ./backend
+        run: pip install -r requirements.txt
 
-      - name: Upload artifact for deployment
+      - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            backend/
-            !backend/venv/
+          path: backend  # upload the backend folder as the package
 
   deploy:
     runs-on: ubuntu-latest
@@ -55,6 +52,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
+          path: backend  # download to the same name
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -65,8 +63,7 @@ jobs:
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'api-aigalaxy'
           slot-name: 'Production'
-          
+          package: ./backend
