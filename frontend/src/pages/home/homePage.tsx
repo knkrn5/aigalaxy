@@ -1,5 +1,5 @@
 import reactLogo from "../../assets/react.svg";
-import viteLogo from "../../../public/vite.svg";
+import viteLogo from "../../assets/vite.svg";
 import { NavLink } from "react-router";
 
 interface UserAgentPropTypes {
