@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { NavLink } from "react-router";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -123,13 +124,12 @@ export default function AiDebatePage() {
 
           {/* Call to Action Button */}
           <div className="mt-10">
-            <button
-              type="button"
+            <NavLink
+              to="/"
               className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl active:scale-95 text-lg shadow-lg"
-              onClick={() => (window.location.href = "/")}
             >
               Go Home
-            </button>
+            </NavLink>
           </div>
         </div>
 

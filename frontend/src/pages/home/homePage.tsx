@@ -1,5 +1,6 @@
 import reactLogo from "../../assets/react.svg";
 import viteLogo from "../../../public/vite.svg";
+import { NavLink } from "react-router";
 
 interface UserAgentPropTypes {
   brand: string;
@@ -186,12 +187,12 @@ function Home() {
       </h1>
 
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20 mb-8">
-        <button
-          onClick={() => (window.location.href = "/ai-debate")}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl active:scale-95 mb-6 text-lg"
+        <NavLink
+          to="/ai-debate"
+          className={`bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl active:scale-95 mb-6 text-lg`}
         >
           Go to AI Debate
-        </button>
+        </NavLink>
       </div>
     </div>
   );
