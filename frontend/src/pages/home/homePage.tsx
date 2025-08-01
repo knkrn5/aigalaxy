@@ -12,6 +12,13 @@ interface UserAgentPropTypes {
   bitness?: string;
 }
 
+interface NetworkPropTypes {
+  downlink: number;
+  effectiveType: string;
+  rtt: number;
+  saveData: boolean;
+}
+
 function Home() {
   //   const [count, setCount] = useState(0);
 
@@ -54,7 +61,15 @@ function Home() {
     const gpu = getGPUInfo();
 
     // Combine with UA Client Hints if needed
-    let userAgentInfo: UserAgentPropTypes = {};
+    let userAgentInfo: UserAgentPropTypes = {
+      brand: "Unknown",
+      model: "Unknown",
+      mobile: false,
+      platform: "Unknown",
+      platformVersion: "Unknown",
+      fullVersionList: [],
+    };
+
     if ("userAgentData" in navigator) {
       try {
         const ua = await navigator.userAgentData.getHighEntropyValues([
@@ -75,7 +90,7 @@ function Home() {
 
     let networkInfo = {};
     if ("connection" in navigator) {
-      const conn = navigator.connection;
+      const conn = navigator.connection as NetworkPropTypes;
       networkInfo = {
         downlink: conn.downlink, // Mbps
         effectiveType: conn.effectiveType, // '4g', '3g', etc.
