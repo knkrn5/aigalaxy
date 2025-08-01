@@ -19,6 +19,13 @@ interface NetworkPropTypes {
   saveData: boolean;
 }
 
+interface BatteryPropTypes {
+  charging: boolean;
+  level: number; // 0 to 1
+  chargingTime: number;
+  dischargingTime: number;
+}
+
 function Home() {
   //   const [count, setCount] = useState(0);
 
@@ -70,7 +77,7 @@ function Home() {
       fullVersionList: [],
     };
 
-    if ("userAgentData" in navigator) {
+    if ("userAgentData" in navigator && navigator.userAgentData) {
       try {
         const ua = await navigator.userAgentData.getHighEntropyValues([
           "model",
@@ -101,7 +108,9 @@ function Home() {
 
     let batteryInfo = {};
     if ("getBattery" in navigator) {
-      const battery = await navigator.getBattery();
+      const battery = await (
+        navigator.getBattery as () => Promise<BatteryPropTypes>
+      )();
       batteryInfo = {
         charging: battery.charging,
         level: battery.level, // 0 to 1
