@@ -14,7 +14,7 @@ export default function AiDebatePage() {
       setAIResponse("Please enter a valid question.");
       return;
     }
-    
+
     setAIResponse("");
     setIsFetching(true);
 
@@ -23,13 +23,13 @@ export default function AiDebatePage() {
       `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
     );
 
-    eventSource.onopen = () => {
-      console.log("SSE connection opened");
-    };
+    // eventSource.onopen = () => {
+    //   console.log("SSE connection opened");
+    // };
 
     eventSource.onmessage = (event) => {
       console.log("Received data:", event.data);
-      if (event.data === "[END]") {
+      if (event.data === "[DONE]") {
         eventSource.close();
         setIsFetching(false);
         return;
@@ -72,7 +72,7 @@ export default function AiDebatePage() {
               value={inputvalue}
               onChange={(e) => setinputvalue(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !isFetching && inputvalue.trim()) {
+                if (e.key === "Enter" && !isFetching && inputvalue.trim()) {
                   handleGetAIResponse(inputvalue);
                 }
               }}
@@ -107,7 +107,7 @@ export default function AiDebatePage() {
               </div>
             ) : (
               <div className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl mx-auto">
-                {!aiResponse ? (
+                {/* {!aiResponse ? (
                   <p className="text-center">
                     Welcome to AI Galaxy where artificial intelligence meets human
                     curiosity in the ultimate debate arena.
@@ -116,7 +116,13 @@ export default function AiDebatePage() {
                   <div className="text-left whitespace-pre-wrap bg-gray-800/30 rounded-lg p-4">
                     {aiResponse}
                   </div>
-                )}
+                )} */}
+
+                <p className="text-center">
+                  {!aiResponse
+                    ? "Welcome to AI Galaxy where artificial intelligence meets human curiosity in the ultimate debate arena."
+                    : aiResponse}
+                </p>
               </div>
             )}
           </div>

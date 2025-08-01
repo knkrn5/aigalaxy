@@ -32,4 +32,4 @@ class aichatservice:
                 yield f"data: {chunk.choices[0].delta.content}\n\n"
                 # await asyncio.sleep(0.01)
 
-        yield "data: [END]\n\n"
+        yield "data: [DONE]\n\n"
