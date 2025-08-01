@@ -12,6 +12,10 @@ interface UserAgentPropTypes {
   bitness?: string;
 }
 
+interface UserAgentData {
+  getHighEntropyValues(hints: string[]): Promise<UserAgentPropTypes>;
+}
+
 interface NetworkPropTypes {
   downlink: number;
   effectiveType: string;
@@ -79,7 +83,9 @@ function Home() {
 
     if ("userAgentData" in navigator && navigator.userAgentData) {
       try {
-        const ua = await navigator.userAgentData.getHighEntropyValues([
+        const ua = await (
+          navigator.userAgentData as UserAgentData
+        ).getHighEntropyValues([
           "model",
           "brand",
           "mobile",
