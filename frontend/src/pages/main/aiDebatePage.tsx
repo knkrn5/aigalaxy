@@ -18,27 +18,17 @@ export default function AiDebatePage() {
     setAIResponse("");
     setIsFetching(true);
 
-    //   fetch(`${BACKEND_URL}/aichats/aichat-res`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ question: inputvalue }),
-    //   })
-    //     .then((response) => response.text())
-    //     .then((data) => {
-    //       setAIResponse(data);
-    //     })
-    //     .finally(() => {
-    //       setIsFetching(false);
-    //     });
-
     const encodedQuestion = encodeURIComponent(inputvalue);
     const eventSource = new EventSource(
       `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
     );
 
+    eventSource.onopen = () => {
+      console.log("SSE connection opened");
+    };
+
     eventSource.onmessage = (event) => {
+      console.log("Received data:", event.data);
       if (event.data === "[END]") {
         eventSource.close();
         setIsFetching(false);
@@ -49,9 +39,13 @@ export default function AiDebatePage() {
 
     eventSource.onerror = (error) => {
       console.error("SSE error:", error);
-      eventSource.close(); // always close on error
+      setAIResponse("Error: Failed to get AI response. Please try again.");
+      eventSource.close();
       setIsFetching(false);
     };
+
+    // Clear input after sending
+    setinputvalue("");
   };
 
   return (
@@ -74,30 +68,56 @@ export default function AiDebatePage() {
             <input
               type="text"
               placeholder="Ask a question"
-              className="w-full bg-transparent mb-5 border border-white/20 shadow-2xl shadow-amber-50 px-4 py-2 rounded-full"
+              className="w-full bg-transparent mb-5 border border-white/20 shadow-2xl shadow-amber-50 px-4 py-2 rounded-full text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50"
               value={inputvalue}
               onChange={(e) => setinputvalue(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !isFetching && inputvalue.trim()) {
+                  handleGetAIResponse(inputvalue);
+                }
+              }}
+              disabled={isFetching}
             />
 
             <button
               title="get ai response"
               type="button"
-              disabled={isFetching}
-              className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer disabled:cursor-not-allowed transition-transform hover:scale-105 active:scale-95"
-                onClick={() => handleGetAIResponse(inputvalue)}
+              disabled={isFetching || !inputvalue.trim()}
+              className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+              onClick={() => handleGetAIResponse(inputvalue)}
             >
-              <IoIosSend size={32} className="w-10 h-10 text-white" />
+              {isFetching ? (
+                <AiOutlineLoading3Quarters className="w-10 h-10 text-white animate-spin" />
+              ) : (
+                <IoIosSend size={32} className="w-10 h-10 text-white" />
+              )}
             </button>
 
             {isFetching ? (
-              <AiOutlineLoading3Quarters className="w-10 h-10 mx-auto text-white animate-spin" />
+              <div className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl mx-auto">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <AiOutlineLoading3Quarters className="w-6 h-6 text-cyan-400 animate-spin" />
+                  <span>AI is thinking...</span>
+                </div>
+                {aiResponse && (
+                  <div className="text-left whitespace-pre-wrap bg-gray-800/30 rounded-lg p-4 mt-4">
+                    {aiResponse}
+                  </div>
+                )}
+              </div>
             ) : (
-              <p className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl mx-auto">
-                {!aiResponse
-                  ? `Welcome to AI Galaxy where artificial intelligence meets human
-              curiosity in the ultimate debate arena. `
-                  : aiResponse}
-              </p>
+              <div className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-3xl mx-auto">
+                {!aiResponse ? (
+                  <p className="text-center">
+                    Welcome to AI Galaxy where artificial intelligence meets human
+                    curiosity in the ultimate debate arena.
+                  </p>
+                ) : (
+                  <div className="text-left whitespace-pre-wrap bg-gray-800/30 rounded-lg p-4">
+                    {aiResponse}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
