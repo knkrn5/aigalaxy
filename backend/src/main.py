@@ -8,11 +8,16 @@ import os
 is_production = os.getenv("ENV") == "PRODUCTION"
 
 
-origins = [
-    "http://localhost:5173",
-] if not is_production else [
-    "https://your-production-domain.com",
-]
+origins = (
+    [
+        "http://localhost:5173",
+    ]
+    if not is_production
+    else [
+        "https://aigalaxy.tech",
+        "https://www.aigalaxy.tech",
+    ]
+)
 
 
 @asynccontextmanager
