@@ -6,7 +6,6 @@ from .routes.aichats_routes import router as aichatsroutes
 import os
 
 is_production = os.getenv("ENV") == "PRODUCTION"
-print(is_production)
 
 
 origins = [

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { NavLink } from "react-router";
+import ReactMarkdown from "react-markdown";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -29,7 +30,6 @@ export default function AiDebatePage() {
     };
 
     eventSource.onmessage = (event) => {
-      console.log("Received data:", event.data);
       if (event.data === "[DONE]") {
         eventSource.close();
         setIsFetching(false);
@@ -114,8 +114,8 @@ export default function AiDebatePage() {
                     human curiosity in the ultimate debate arena.
                   </p>
                 ) : (
-                  <div className="text-left whitespace-pre-wrap bg-gray-800/30 rounded-lg p-4">
-                    {aiResponse}
+                  <div className="text-left whitespace-pre-wrap prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 ">
+                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
                   </div>
                 )}
               </div>
