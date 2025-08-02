@@ -16,6 +16,7 @@ origins = (
     else [
         "https://aigalaxy.tech",
         "https://www.aigalaxy.tech",
+        "https://aigalaxy-3cwr.onrender.com",
     ]
 )
 
