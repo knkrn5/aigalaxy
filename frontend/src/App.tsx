@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router";
-import Home from "./home/homePage";
-import AiDebatePage from "./main/aiDebatePage";
+import Home from "./pages/home/homePage";
+import AiDebatePage from "./pages/main/aiDebatePage";
 
 function App() {
   return (
