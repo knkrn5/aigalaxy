@@ -4,11 +4,5 @@
   },
   "platform": {
     "name": "staticwebapp"
-  },
-  "routes": [
-    {
-      "route": "/api/*",
-      "allowedRoles": ["anonymous", "authenticated"]
-    }
-  ]
+  }
 }
