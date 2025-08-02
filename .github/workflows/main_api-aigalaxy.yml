@@ -67,3 +67,5 @@ jobs:
           app-name: 'api-aigalaxy'
           slot-name: 'Production'
           package: ./backend
+
+
