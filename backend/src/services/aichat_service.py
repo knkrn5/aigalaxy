@@ -14,7 +14,7 @@ class aichatservice:
     def aichat(question: str):
         if not question:
             raise ValueError("Question cannot be empty")
-            
+
         completion = client.chat.completions.create(
             model="nvidia/llama-3.3-nemotron-super-49b-v1",
             messages=[{"role": "user", "content": question}],
@@ -32,4 +32,4 @@ class aichatservice:
                 yield f"data: {chunk.choices[0].delta.content}\n\n"
                 # await asyncio.sleep(0.01)
 
-        yield "data: [DONE]\n\n"
+        # yield "data: [DONE]\n\n"

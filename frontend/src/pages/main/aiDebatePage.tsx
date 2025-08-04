@@ -20,33 +20,86 @@ export default function AiDebatePage() {
     setAIResponse("");
     setIsFetching(true);
 
-    const encodedQuestion = encodeURIComponent(inputvalue);
-    const eventSource = new EventSource(
-      `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
-    );
+    fetch(`${BACKEND_URL}/aichats/aichat-res`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: inputvalue }),
+    }).then((response) => {
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
 
-    eventSource.onopen = () => {
-      console.log("SSE connection opened");
-    };
+      readStream();
 
-    eventSource.onmessage = (event) => {
-      if (event.data === "[DONE]") {
-        eventSource.close();
-        setIsFetching(false);
-        return;
+      function readStream() {
+        reader?.read().then(({ value, done }) => {
+          if (done) {
+            setIsFetching(false);
+            return;
+          }
+          const chunk = decoder.decode(value);
+          console.log(chunk);
+
+          const lines = chunk.split("\n\n");
+
+          lines.forEach((line) => {
+            if (line.startsWith("data: ")) {
+              const message = line.slice(6);
+              setAIResponse((prev) => prev + message);
+            }
+          });
+
+          // for (const line of lines) {
+          //   if (line.startsWith("data: ")) {
+          //     const message = line.slice(6);
+          //     setAIResponse((prev) => prev + message);
+          //   }
+          // }
+
+          readStream();
+        });
+
+        // if (data.startsWith("data: ")) {
+        //   data = data.slice(6);
+        // }
+        // // const chunks = data.slice(6);
+        // if (data === "[DONE]") {
+        //   setIsFetching(false);
+        //   return;
+        // }
+        // setAIResponse(data);
+        // setIsFetching(false);
+
+        // const encodedQuestion = encodeURIComponent(inputvalue);
+        // const eventSource = new EventSource(
+        //   `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
+        // );
+
+        // eventSource.onopen = () => {
+        //   console.log("SSE connection opened");
+        // };
+
+        // eventSource.onmessage = (event) => {
+        //   if (event.data === "[DONE]") {
+        //     eventSource.close();
+        //     setIsFetching(false);
+        //     return;
+        //   }
+        //   setAIResponse((prev) => prev + event.data);
+        // };
+
+        // eventSource.onerror = (error) => {
+        //   console.error("SSE error:", error);
+        //   setAIResponse("Error: Failed to get AI response. Please try again.");
+        //   eventSource.close();
+        //   setIsFetching(false);
+        // };
+
+        // Clear input after sending
+        setinputvalue("");
       }
-      setAIResponse((prev) => prev + event.data);
-    };
-
-    eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
-      setAIResponse("Error: Failed to get AI response. Please try again.");
-      eventSource.close();
-      setIsFetching(false);
-    };
-
-    // Clear input after sending
-    setinputvalue("");
+    });
   };
 
   return (
