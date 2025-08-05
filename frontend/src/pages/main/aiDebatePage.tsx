@@ -39,7 +39,6 @@ export default function AiDebatePage() {
             return;
           }
           const chunk = decoder.decode(value);
-          console.log(chunk);
 
           const lines = chunk.split("\n\n");
 
