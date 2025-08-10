@@ -4,6 +4,7 @@ import Home from "./pages/home/homePage";
 import AiDebatePage from "./pages/main/aiDebatePage";
 import axios from "axios";
 
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
     axios
       .get(`${BACKEND_URL}/envvar/get-app-pass`)
       .then((response) => {
-        const appPass = response.data.app_pass.trim().toLowerCase();
+        const appPass = response.data.trim().toLowerCase();
 
         if (appPassInSS && appPassInSS === appPass) {
           setIsAuthenticated(true);
@@ -81,6 +82,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/ai-debate" element={<AiDebatePage />} />
+
+      {/* <Route path="/test" element={<Redirect />} /> */}
     </Routes>
   );
 }
