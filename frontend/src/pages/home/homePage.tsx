@@ -42,7 +42,7 @@ interface DeviceInfo {
   };
   locale: {
     language: string;
-    languages: string[];
+    languages: readonly string[];
     timezone: string;
   };
   device: {
@@ -79,12 +79,12 @@ interface DeviceInfo {
   };
 }
 
-function getGPUInfo() {
+function getGPUInfo(): { vendor: string; renderer: string } {
   const canvas = document.createElement("canvas");
   const gl =
     canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
-  if (!gl) return "WebGL not supported";
+  if (!gl) return { vendor: "Unknown", renderer: "Unknown" };
 
   const debugInfo = (gl as WebGLRenderingContext).getExtension(
     "WEBGL_debug_renderer_info"
@@ -110,7 +110,7 @@ async function getHardwareInfo(): Promise<DeviceInfo> {
   const concurrency = navigator.hardwareConcurrency || "Unknown";
   const memory =
     "deviceMemory" in navigator
-      ? navigator.deviceMemory
+      ? (navigator.deviceMemory as number)
       : "Unknown (or not supported)";
 
   const gpu = getGPUInfo();
@@ -205,7 +205,7 @@ async function getHardwareInfo(): Promise<DeviceInfo> {
 }
 
 function Home() {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>();
   const [loading, setLoading] = useState(true);
 
   // Usage - fetch device info on component mount
@@ -461,9 +461,9 @@ function Home() {
                         {lang}
                       </span>
                     ))}
-                  {deviceInfo?.locale?.languages?.length > 3 && (
+                  {deviceInfo.locale.languages.length > 3 && (
                     <span className="text-gray-400 text-xs">
-                      +{deviceInfo?.locale?.languages?.length - 3} more
+                      +{deviceInfo.locale.languages.length - 3} more
                     </span>
                   )}
                 </div>
