@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Home from "./pages/home/homePage";
 import AiDebatePage from "./pages/main/aiDebatePage";
 import axios from "axios";
+import Loading from "./components/ui/loading";
+import AuthDenied from "./pages/auth/authDenied";
 
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -50,31 +52,16 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
-          <p className="text-white mt-4">Loading...</p>
-        </div>
-      </div>
+      <Loading 
+        type="full-page" 
+        message="Loading..." 
+      />
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-red-900">
-        <div className="text-center bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
-          <h1 className="text-4xl font-bold mb-4 text-white">Access Denied</h1>
-          <p className="text-lg text-gray-200 mb-6">
-            Invalid password. Please refresh the page to try again.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
+      <AuthDenied />
     );
   }
 

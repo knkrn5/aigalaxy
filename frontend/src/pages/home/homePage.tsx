@@ -2,6 +2,7 @@ import reactLogo from "../../assets/react.svg";
 import viteLogo from "../../assets/vite.svg";
 import { NavLink } from "react-router";
 import { useState, useEffect } from "react";
+import Loading from "../../components/ui/loading";
 
 interface UserAgentPropTypes {
   brand: string;
@@ -238,9 +239,10 @@ function Home() {
       </h1>
 
       {loading ? (
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
-        </div>
+        <Loading 
+          type="full-page" 
+          message="Scanning your device information..." 
+        />
       ) : (
         <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Screen Information */}
