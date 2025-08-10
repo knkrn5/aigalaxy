@@ -131,7 +131,7 @@ export default function AuthDenied() {
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="mx-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl active:scale-95 flex items-center space-x-2"
+          className="mx-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl active:scale-95 flex items-center space-x-2 cursor-pointer"
         >
           <FaRepeat className="w-5 h-5" />
           <span>Retry</span>
@@ -160,7 +160,7 @@ export default function AuthDenied() {
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-red-400/30 rounded-full auth-denied-particle"
+            className="auth-denied-particle absolute w-2 h-2 bg-red-400/30 rounded-full "
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
