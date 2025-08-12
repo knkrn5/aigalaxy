@@ -1,210 +1,9 @@
-import reactLogo from "../../assets/react.svg";
-import viteLogo from "../../assets/vite.svg";
 import { NavLink } from "react-router";
 import { useState, useEffect } from "react";
 import Loading from "../../components/ui/loading";
-import './homePage.css';
-
-interface UserAgentPropTypes {
-  brand: string;
-  model: string;
-  mobile: boolean;
-  platform: string;
-  platformVersion: string;
-  fullVersionList: Array<{ brand: string; version: string }>;
-  architecture?: string;
-  bitness?: string;
-}
-
-interface UserAgentData {
-  getHighEntropyValues(hints: string[]): Promise<UserAgentPropTypes>;
-}
-
-interface NetworkPropTypes {
-  downlink: number;
-  effectiveType: string;
-  rtt: number;
-  saveData: boolean;
-}
-
-interface BatteryPropTypes {
-  charging: boolean;
-  level: number; // 0 to 1
-  chargingTime: number;
-  dischargingTime: number;
-}
-
-interface DeviceInfo {
-  screen: {
-    width: number;
-    height: number;
-    colorDepth: number;
-    pixelDepth: number;
-    devicePixelRatio: number;
-  };
-  locale: {
-    language: string;
-    languages: readonly string[];
-    timezone: string;
-  };
-  device: {
-    model: string;
-    mobile: boolean;
-    brand: string;
-    platform: string;
-    platformVersion: string;
-    fullVersionList: Array<{ brand: string; version: string }>;
-  };
-  memory: {
-    approximateGB: number | string;
-  };
-  cpu: {
-    logicalCores: number | string;
-    architecture: string;
-    bitness: string;
-  };
-  gpu: {
-    vendor: string;
-    renderer: string;
-  };
-  networkInfo: {
-    downlink?: number;
-    effectiveType?: string;
-    rtt?: number;
-    saveData?: boolean;
-  };
-  batteryInfo: {
-    charging?: boolean;
-    level?: number;
-    chargingTime?: number;
-    dischargingTime?: number;
-  };
-}
-
-function getGPUInfo(): { vendor: string; renderer: string } {
-  const canvas = document.createElement("canvas");
-  const gl =
-    canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-
-  if (!gl) return { vendor: "Unknown", renderer: "Unknown" };
-
-  const debugInfo = (gl as WebGLRenderingContext).getExtension(
-    "WEBGL_debug_renderer_info"
-  );
-  if (debugInfo) {
-    const renderer = (gl as WebGLRenderingContext).getParameter(
-      debugInfo.UNMASKED_RENDERER_WEBGL
-    );
-    const vendor = (gl as WebGLRenderingContext).getParameter(
-      debugInfo.UNMASKED_VENDOR_WEBGL
-    );
-    return { vendor, renderer };
-  }
-
-  return {
-    vendor: "Unknown (WebGL vendor info restricted)",
-    renderer: "Unknown",
-  };
-}
-
-// hardware data
-async function getHardwareInfo(): Promise<DeviceInfo> {
-  const concurrency = navigator.hardwareConcurrency || "Unknown";
-  const memory =
-    "deviceMemory" in navigator
-      ? (navigator.deviceMemory as number)
-      : "Unknown (or not supported)";
-
-  const gpu = getGPUInfo();
-
-  // Combine with UA Client Hints if needed
-  let userAgentInfo: UserAgentPropTypes = {
-    brand: "Unknown",
-    model: "Unknown",
-    mobile: false,
-    platform: "Unknown",
-    platformVersion: "Unknown",
-    fullVersionList: [],
-  };
-
-  if ("userAgentData" in navigator && navigator.userAgentData) {
-    try {
-      const ua = await (
-        navigator.userAgentData as UserAgentData
-      ).getHighEntropyValues([
-        "model",
-        "brand",
-        "mobile",
-        "platform",
-        "platformVersion",
-        "fullVersionList",
-        "architecture",
-        "bitness",
-      ]);
-      userAgentInfo = ua;
-    } catch (e) {
-      console.warn("Could not get UA high-entropy values:", e);
-    }
-  }
-
-  let networkInfo = {};
-  if ("connection" in navigator) {
-    const conn = navigator.connection as NetworkPropTypes;
-    networkInfo = {
-      downlink: conn.downlink, // Mbps
-      effectiveType: conn.effectiveType, // '4g', '3g', etc.
-      rtt: conn.rtt, // Round-trip time
-      saveData: conn.saveData, // Data-saver mode
-    };
-  }
-
-  let batteryInfo = {};
-  if ("getBattery" in navigator) {
-    const battery = await (
-      navigator.getBattery as () => Promise<BatteryPropTypes>
-    )();
-    batteryInfo = {
-      charging: battery.charging,
-      level: battery.level, // 0 to 1
-      chargingTime: battery.chargingTime,
-      dischargingTime: battery.dischargingTime,
-    };
-  }
-
-  return {
-    screen: {
-      width: window.screen.width,
-      height: window.screen.height,
-      colorDepth: window.screen.colorDepth,
-      pixelDepth: window.screen.pixelDepth,
-      devicePixelRatio: window.devicePixelRatio,
-    },
-    locale: {
-      language: navigator.language,
-      languages: navigator.languages,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    device: {
-      model: userAgentInfo.model || "Unknown",
-      mobile: userAgentInfo.mobile || false,
-      brand: userAgentInfo.brand || "Unknown",
-      platform: userAgentInfo.platform || "Unknown",
-      platformVersion: userAgentInfo.platformVersion || "Unknown",
-      fullVersionList: userAgentInfo.fullVersionList || [],
-    },
-    memory: {
-      approximateGB: memory,
-    },
-    cpu: {
-      logicalCores: concurrency,
-      architecture: userAgentInfo.architecture || "Unknown",
-      bitness: userAgentInfo.bitness || "Unknown",
-    },
-    gpu,
-    networkInfo,
-    batteryInfo,
-  };
-}
+import "./homePage.css";
+import { getHardwareInfo } from "../../utils/getHardwareInfo";
+import type { DeviceInfo } from "../../utils/getHardwareInfo";
 
 function Home() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>();
@@ -293,21 +92,6 @@ function Home() {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        {/* Logo section */}
-        <div className="flex items-center gap-8 mb-12 glow-pulse">
-          <img
-            src={viteLogo}
-            className="h-20 w-20 drop-shadow-2xl hover:drop-shadow-[0_0_2em_#646cffaa] transition-all duration-500 hover:scale-110"
-            alt="Vite logo"
-          />
-          <div className="w-px h-16 bg-gradient-to-b from-transparent via-white/50 to-transparent"></div>
-          <img
-            src={reactLogo}
-            className="h-20 w-20 drop-shadow-2xl hover:drop-shadow-[0_0_2em_#61dafbaa] transition-all duration-500 hover:scale-110 animate-spin"
-            style={{ animationDuration: '10s' }}
-            alt="React logo"
-          />
-        </div>
 
         {/* Main title */}
         <div className="text-center mb-16">
@@ -317,7 +101,8 @@ function Home() {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Explore the infinite possibilities of artificial intelligence in our cosmic digital universe
+            Explore the infinite possibilities of artificial intelligence in our
+            cosmic digital universe
           </p>
         </div>
 
@@ -327,22 +112,43 @@ function Home() {
           <div className="galaxy-card bg-gradient-to-br from-purple-500/20 to-blue-600/20 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-white">AI Debate</h3>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Engage in intelligent conversations and debates with advanced AI systems. Experience the future of dialogue.
+              Engage in intelligent conversations and debates with advanced AI
+              systems. Experience the future of dialogue.
             </p>
             <NavLink
               to="/ai-debate"
               className="inline-flex items-center bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               Launch Debate
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              <svg
+                className="w-5 h-5 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
               </svg>
             </NavLink>
           </div>
@@ -351,22 +157,43 @@ function Home() {
           <div className="galaxy-card bg-gradient-to-br from-cyan-500/20 to-green-600/20 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-white">Device Scanner</h3>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Discover comprehensive information about your device, browser, and system capabilities.
+              Discover comprehensive information about your device, browser, and
+              system capabilities.
             </p>
             <button
               onClick={() => setShowDeviceInfo(!showDeviceInfo)}
               className="inline-flex items-center bg-gradient-to-r from-cyan-500 to-green-600 hover:from-cyan-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
-              {showDeviceInfo ? 'Hide' : 'Scan'} Device
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              {showDeviceInfo ? "Hide" : "Scan"} Device
+              <svg
+                className="w-5 h-5 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </button>
           </div>
@@ -375,19 +202,42 @@ function Home() {
           <div className="galaxy-card bg-gradient-to-br from-pink-500/20 to-red-600/20 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl md:col-span-2 lg:col-span-1">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-600 rounded-xl flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white">Explore Universe</h3>
+              <h3 className="text-2xl font-bold text-white">
+                Explore Universe
+              </h3>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Journey through our digital galaxy and discover new frontiers of artificial intelligence.
+              Journey through our digital galaxy and discover new frontiers of
+              artificial intelligence.
             </p>
             <button className="inline-flex items-center bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl opacity-60 cursor-not-allowed">
               Coming Soon
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <svg
+                className="w-5 h-5 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
               </svg>
             </button>
           </div>
@@ -395,285 +245,297 @@ function Home() {
 
         {/* Device Information Dashboard */}
         {loading ? (
-          <Loading 
-            type="galaxy" 
+          <Loading
+            type="galaxy"
             size="xl"
-            message="Scanning cosmic frequencies..." 
+            message="Scanning cosmic frequencies..."
           />
-        ) : showDeviceInfo && (
-          <div className="w-full max-w-7xl">
-            <h2 className="text-3xl font-bold text-center mb-8">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
-                Cosmic Device Analysis
-              </span>
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* All your existing device info cards */}
-          {/* Screen Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
-              Screen & Display
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Resolution:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.screen?.width} × {deviceInfo?.screen?.height}
+        ) : (
+          showDeviceInfo && (
+            <div className="w-full max-w-7xl">
+              <h2 className="text-3xl font-bold text-center mb-8">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+                  Cosmic Device Analysis
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Color Depth:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.screen?.colorDepth} bit
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Pixel Ratio:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.screen?.devicePixelRatio}x
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Device Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
-              Device Details
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Platform:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.device?.platform}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Mobile:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.device?.mobile ? "Yes" : "No"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Brand:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.device?.brand}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Model:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.device?.model}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* CPU Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-              CPU & Memory
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Logical Cores:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.cpu?.logicalCores}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Architecture:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.cpu?.architecture}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Memory:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.memory?.approximateGB} GB
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* GPU Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-red-400 rounded-full mr-3"></span>
-              Graphics (GPU)
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Vendor:</span>
-                <span className="text-white font-mono text-xs">
-                  {deviceInfo?.gpu?.vendor || "Unknown"}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-gray-300 mb-1">Renderer:</span>
-                <span className="text-white font-mono text-xs break-all">
-                  {deviceInfo?.gpu?.renderer || "Unknown"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Network Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-purple-400 rounded-full mr-3"></span>
-              Network
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Type:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.networkInfo?.effectiveType || "Unknown"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Downlink:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.networkInfo?.downlink || "Unknown"} Mbps
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">RTT:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.networkInfo?.rtt || "Unknown"} ms
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Data Saver:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.networkInfo?.saveData ? "On" : "Off"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Battery Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-orange-400 rounded-full mr-3"></span>
-              Battery Status
-            </h3>
-            <div className="space-y-3 text-sm">
-              {deviceInfo?.batteryInfo?.level !== undefined ? (
-                <>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Level:</span>
-                    <span className="text-white font-mono">
-                      {Math.round((deviceInfo?.batteryInfo?.level || 0) * 100)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Charging:</span>
-                    <span className="text-white font-mono">
-                      {deviceInfo?.batteryInfo?.charging ? "Yes" : "No"}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{
-                        width: `${
-                          (deviceInfo?.batteryInfo?.level || 0) * 100
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-gray-400 text-center">
-                  Battery API not supported
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Locale Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20 md:col-span-2 lg:col-span-1">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
-              Locale & Language
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Language:</span>
-                <span className="text-white font-mono">
-                  {deviceInfo?.locale?.language}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Timezone:</span>
-                <span className="text-white font-mono text-xs">
-                  {deviceInfo?.locale?.timezone}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-gray-300 mb-1">Supported Languages:</span>
-                <div className="flex flex-wrap gap-1">
-                  {deviceInfo?.locale?.languages
-                    ?.slice(0, 3)
-                    .map((lang: string, index: number) => (
-                      <span
-                        key={index}
-                        className="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded text-xs"
-                      >
-                        {lang}
-                      </span>
-                    ))}
-                  {deviceInfo?.locale?.languages && deviceInfo.locale.languages.length > 3 && (
-                    <span className="text-gray-400 text-xs">
-                      +{deviceInfo.locale.languages.length - 3} more
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Browser Information */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20 md:col-span-2">
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
-              Browser Versions
-            </h3>
-            <div className="space-y-2 text-sm max-h-32 overflow-y-auto">
-              {deviceInfo?.device?.fullVersionList && deviceInfo.device.fullVersionList.length > 0 ? (
-                deviceInfo?.device?.fullVersionList?.map(
-                  (
-                    browser: { brand: string; version: string },
-                    index: number
-                  ) => (
-                    <div
-                      key={index}
-                      className="flex justify-between py-1 border-b border-white/10 last:border-b-0"
-                    >
-                      <span className="text-gray-300">{browser.brand}:</span>
-                      <span className="text-white font-mono text-xs">
-                        {browser.version}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* All your existing device info cards */}
+                {/* Screen Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
+                    Screen & Display
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Resolution:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.screen?.width} ×{" "}
+                        {deviceInfo?.screen?.height}
                       </span>
                     </div>
-                  )
-                )
-              ) : (
-                <div className="text-gray-400 text-center">
-                  Browser version info not available
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Color Depth:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.screen?.colorDepth} bit
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Pixel Ratio:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.screen?.devicePixelRatio}x
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              )}
+
+                {/* Device Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
+                    Device Details
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Platform:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.device?.platform}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Mobile:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.device?.mobile ? "Yes" : "No"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Brand:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.device?.brand}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Model:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.device?.model}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CPU Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                    CPU & Memory
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Logical Cores:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.cpu?.logicalCores}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Architecture:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.cpu?.architecture}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Memory:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.memory?.approximateGB} GB
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* GPU Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-red-400 rounded-full mr-3"></span>
+                    Graphics (GPU)
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Vendor:</span>
+                      <span className="text-white font-mono text-xs">
+                        {deviceInfo?.gpu?.vendor || "Unknown"}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-gray-300 mb-1">Renderer:</span>
+                      <span className="text-white font-mono text-xs break-all">
+                        {deviceInfo?.gpu?.renderer || "Unknown"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Network Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full mr-3"></span>
+                    Network
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Type:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.networkInfo?.effectiveType || "Unknown"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Downlink:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.networkInfo?.downlink || "Unknown"} Mbps
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">RTT:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.networkInfo?.rtt || "Unknown"} ms
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Data Saver:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.networkInfo?.saveData ? "On" : "Off"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Battery Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-3"></span>
+                    Battery Status
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    {deviceInfo?.batteryInfo?.level !== undefined ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-gray-300">Level:</span>
+                          <span className="text-white font-mono">
+                            {Math.round(
+                              (deviceInfo?.batteryInfo?.level || 0) * 100
+                            )}
+                            %
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-300">Charging:</span>
+                          <span className="text-white font-mono">
+                            {deviceInfo?.batteryInfo?.charging ? "Yes" : "No"}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${
+                                (deviceInfo?.batteryInfo?.level || 0) * 100
+                              }%`,
+                            }}
+                          ></div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-gray-400 text-center">
+                        Battery API not supported
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Locale Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20 md:col-span-2 lg:col-span-1">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
+                    Locale & Language
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Language:</span>
+                      <span className="text-white font-mono">
+                        {deviceInfo?.locale?.language}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Timezone:</span>
+                      <span className="text-white font-mono text-xs">
+                        {deviceInfo?.locale?.timezone}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-gray-300 mb-1">
+                        Supported Languages:
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {deviceInfo?.locale?.languages
+                          ?.slice(0, 3)
+                          .map((lang: string, index: number) => (
+                            <span
+                              key={index}
+                              className="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded text-xs"
+                            >
+                              {lang}
+                            </span>
+                          ))}
+                        {deviceInfo?.locale?.languages &&
+                          deviceInfo.locale.languages.length > 3 && (
+                            <span className="text-gray-400 text-xs">
+                              +{deviceInfo.locale.languages.length - 3} more
+                            </span>
+                          )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Browser Information */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20 md:col-span-2">
+                  <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
+                    Browser Versions
+                  </h3>
+                  <div className="space-y-2 text-sm max-h-32 overflow-y-auto">
+                    {deviceInfo?.device?.fullVersionList &&
+                    deviceInfo.device.fullVersionList.length > 0 ? (
+                      deviceInfo?.device?.fullVersionList?.map(
+                        (
+                          browser: { brand: string; version: string },
+                          index: number
+                        ) => (
+                          <div
+                            key={index}
+                            className="flex justify-between py-1 border-b border-white/10 last:border-b-0"
+                          >
+                            <span className="text-gray-300">
+                              {browser.brand}:
+                            </span>
+                            <span className="text-white font-mono text-xs">
+                              {browser.version}
+                            </span>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <div className="text-gray-400 text-center">
+                        Browser version info not available
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )
+        )}
       </div>
-    )}
-  </div>
-</div>
-);
+    </div>
+  );
 }
 
 export default Home;
