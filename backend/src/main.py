@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes.aichats_routes import router as aichatsroutes
+from .routes.envvar_routes import router as apiroutes
 import os
 
 is_production = os.getenv("ENV") == "PRODUCTION"
@@ -54,3 +55,4 @@ def read_health():
 
 
 app.include_router(aichatsroutes, prefix="/aichats", tags=["AI Chat"])
+app.include_router(apiroutes, prefix="/envvar", tags=["Environment Variables"])
