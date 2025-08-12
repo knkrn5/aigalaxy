@@ -3,6 +3,7 @@ import viteLogo from "../../assets/vite.svg";
 import { NavLink } from "react-router";
 import { useState, useEffect } from "react";
 import Loading from "../../components/ui/loading";
+import './homePage.css';
 
 interface UserAgentPropTypes {
   brand: string;
@@ -208,6 +209,7 @@ async function getHardwareInfo(): Promise<DeviceInfo> {
 function Home() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [showDeviceInfo, setShowDeviceInfo] = useState<boolean>(false);
 
   // Usage - fetch device info on component mount
   useEffect(() => {
@@ -220,31 +222,193 @@ function Home() {
   //   console.log(navigator);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center justify-center p-4">
-      <div className="flex items-center gap-8 mb-8">
-        <img
-          src={viteLogo}
-          className="h-16 w-16 drop-shadow-2xl group-hover:drop-shadow-[0_0_2em_#646cffaa] transition-all duration-300"
-          alt="Vite logo"
-        />
-        <img
-          src={reactLogo}
-          className="h-16 w-16 drop-shadow-2xl group-hover:drop-shadow-[0_0_2em_#61dafbaa] animate-spin-slow transition-all duration-300"
-          alt="React logo"
-        />
+    <div className="min-h-screen nebula-bg relative overflow-hidden">
+      {/* Animated starfield background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(200)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full star"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+            }}
+          ></div>
+        ))}
       </div>
 
-      <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent mb-8 text-center">
-        Device Information Dashboard
-      </h1>
+      {/* Floating cosmic particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute cosmic-particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 8}s`,
+            }}
+          >
+            <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-cyan-400 rounded-full opacity-60"></div>
+          </div>
+        ))}
+      </div>
 
-      {loading ? (
-        <Loading 
-          type="full-page" 
-          message="Scanning your device information..." 
-        />
-      ) : (
-        <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      {/* Main galaxy center */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+        {/* Galaxy core */}
+        <div className="galaxy-core relative">
+          <div className="w-32 h-32 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 rounded-full blur-xl opacity-80"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full opacity-90"></div>
+        </div>
+
+        {/* Galaxy rings */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="galaxy-ring-1 w-64 h-64 border border-purple-400/30 rounded-full"></div>
+        </div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="galaxy-ring-2 w-80 h-80 border border-blue-400/20 rounded-full"></div>
+        </div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="galaxy-ring-3 w-96 h-96 border border-cyan-400/10 rounded-full"></div>
+        </div>
+
+        {/* Orbiting planets */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="planet-orbit-1">
+            <div className="w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg"></div>
+          </div>
+        </div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="planet-orbit-2">
+            <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-blue-500 rounded-full shadow-lg"></div>
+          </div>
+        </div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div className="planet-orbit-3">
+            <div className="w-2 h-2 bg-gradient-to-r from-red-400 to-pink-500 rounded-full shadow-lg"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
+        {/* Logo section */}
+        <div className="flex items-center gap-8 mb-12 glow-pulse">
+          <img
+            src={viteLogo}
+            className="h-20 w-20 drop-shadow-2xl hover:drop-shadow-[0_0_2em_#646cffaa] transition-all duration-500 hover:scale-110"
+            alt="Vite logo"
+          />
+          <div className="w-px h-16 bg-gradient-to-b from-transparent via-white/50 to-transparent"></div>
+          <img
+            src={reactLogo}
+            className="h-20 w-20 drop-shadow-2xl hover:drop-shadow-[0_0_2em_#61dafbaa] transition-all duration-500 hover:scale-110 animate-spin"
+            style={{ animationDuration: '10s' }}
+            alt="React logo"
+          />
+        </div>
+
+        {/* Main title */}
+        <div className="text-center mb-16">
+          <h1 className="text-6xl md:text-8xl font-black mb-6 shimmer-text">
+            <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+              AI GALAXY
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Explore the infinite possibilities of artificial intelligence in our cosmic digital universe
+          </p>
+        </div>
+
+        {/* Navigation cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 max-w-6xl w-full">
+          {/* AI Debate Card */}
+          <div className="galaxy-card bg-gradient-to-br from-purple-500/20 to-blue-600/20 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-white">AI Debate</h3>
+            </div>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Engage in intelligent conversations and debates with advanced AI systems. Experience the future of dialogue.
+            </p>
+            <NavLink
+              to="/ai-debate"
+              className="inline-flex items-center bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+            >
+              Launch Debate
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </NavLink>
+          </div>
+
+          {/* Device Scanner Card */}
+          <div className="galaxy-card bg-gradient-to-br from-cyan-500/20 to-green-600/20 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-white">Device Scanner</h3>
+            </div>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Discover comprehensive information about your device, browser, and system capabilities.
+            </p>
+            <button
+              onClick={() => setShowDeviceInfo(!showDeviceInfo)}
+              className="inline-flex items-center bg-gradient-to-r from-cyan-500 to-green-600 hover:from-cyan-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+            >
+              {showDeviceInfo ? 'Hide' : 'Scan'} Device
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Galaxy Explorer Card */}
+          <div className="galaxy-card bg-gradient-to-br from-pink-500/20 to-red-600/20 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl md:col-span-2 lg:col-span-1">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-600 rounded-xl flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-white">Explore Universe</h3>
+            </div>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Journey through our digital galaxy and discover new frontiers of artificial intelligence.
+            </p>
+            <button className="inline-flex items-center bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl opacity-60 cursor-not-allowed">
+              Coming Soon
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Device Information Dashboard */}
+        {loading ? (
+          <Loading 
+            type="galaxy" 
+            size="xl"
+            message="Scanning cosmic frequencies..." 
+          />
+        ) : showDeviceInfo && (
+          <div className="w-full max-w-7xl">
+            <h2 className="text-3xl font-bold text-center mb-8">
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+                Cosmic Device Analysis
+              </span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* All your existing device info cards */}
           {/* Screen Information */}
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
@@ -505,18 +669,11 @@ function Home() {
             </div>
           </div>
         </div>
-      )}
-
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
-        <NavLink
-          to="/ai-debate"
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl active:scale-95 text-lg inline-block"
-        >
-          Go to AI Debate
-        </NavLink>
       </div>
-    </div>
-  );
+    )}
+  </div>
+</div>
+);
 }
 
 export default Home;
