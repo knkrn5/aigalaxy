@@ -463,7 +463,7 @@ function Home() {
                         {lang}
                       </span>
                     ))}
-                  {deviceInfo?.locale?.languages.length > 3 && (
+                  {deviceInfo?.locale?.languages && deviceInfo.locale.languages.length > 3 && (
                     <span className="text-gray-400 text-xs">
                       +{deviceInfo.locale.languages.length - 3} more
                     </span>
@@ -480,7 +480,7 @@ function Home() {
               Browser Versions
             </h3>
             <div className="space-y-2 text-sm max-h-32 overflow-y-auto">
-              {deviceInfo?.device?.fullVersionList?.length > 0 ? (
+              {deviceInfo?.device?.fullVersionList && deviceInfo.device.fullVersionList.length > 0 ? (
                 deviceInfo?.device?.fullVersionList?.map(
                   (
                     browser: { brand: string; version: string },
