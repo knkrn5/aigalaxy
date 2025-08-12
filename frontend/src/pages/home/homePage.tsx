@@ -207,7 +207,7 @@ async function getHardwareInfo(): Promise<DeviceInfo> {
 
 function Home() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Usage - fetch device info on component mount
   useEffect(() => {
@@ -463,7 +463,7 @@ function Home() {
                         {lang}
                       </span>
                     ))}
-                  {deviceInfo.locale.languages.length > 3 && (
+                  {deviceInfo?.locale?.languages.length > 3 && (
                     <span className="text-gray-400 text-xs">
                       +{deviceInfo.locale.languages.length - 3} more
                     </span>
