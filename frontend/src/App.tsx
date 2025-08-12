@@ -5,7 +5,7 @@ import AiDebatePage from "./pages/main/aiDebatePage";
 import axios from "axios";
 import Loading from "./components/ui/loading";
 import AuthDenied from "./pages/auth/authDenied";
-
+import PageNotFound from "./pages/pageNotFound/pageNotFound";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -51,26 +51,21 @@ function App() {
   }, [appPassInSS, isAuthenticated]);
 
   if (isLoading) {
-    return (
-      <Loading 
-        type="full-page" 
-        message="Loading..." 
-      />
-    );
+    return <Loading type="full-page" message="Loading..." />;
   }
 
   if (!isAuthenticated) {
-    return (
-      <AuthDenied />
-    );
+    return <AuthDenied />;
   }
 
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/ai-debate" element={<AiDebatePage />} />
+      <Route path="ai-debate" element={<AiDebatePage />} />
 
-      {/* <Route path="/test" element={<Redirect />} /> */}
+      {/* Catch-all route for 404 pages */}
+      <Route path="*" element={<PageNotFound />} />
+
     </Routes>
   );
 }
