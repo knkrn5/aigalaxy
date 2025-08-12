@@ -59,16 +59,6 @@ export default function AiDebatePage() {
           readStream();
         });
 
-        // if (data.startsWith("data: ")) {
-        //   data = data.slice(6);
-        // }
-        // // const chunks = data.slice(6);
-        // if (data === "[DONE]") {
-        //   setIsFetching(false);
-        //   return;
-        // }
-        // setAIResponse(data);
-        // setIsFetching(false);
 
         // const encodedQuestion = encodeURIComponent(inputvalue);
         // const eventSource = new EventSource(
