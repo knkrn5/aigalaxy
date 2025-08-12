@@ -1,0 +1,178 @@
+/* Galaxy Home Page Animations */
+
+@keyframes galaxySpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitPlanet {
+  from {
+    transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), 0 0 60px rgba(168, 85, 247, 0.6);
+  }
+}
+
+@keyframes nebula {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes cardHover {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+/* Galaxy core animation */
+.galaxy-core {
+  animation: galaxySpin 20s linear infinite;
+}
+
+.galaxy-ring-1 {
+  animation: galaxySpin 15s linear infinite;
+}
+
+.galaxy-ring-2 {
+  animation: galaxySpin 25s linear infinite reverse;
+}
+
+.galaxy-ring-3 {
+  animation: galaxySpin 30s linear infinite;
+}
+
+/* Planet orbits */
+.planet-orbit-1 {
+  --orbit-radius: 120px;
+  animation: orbitPlanet 8s linear infinite;
+}
+
+.planet-orbit-2 {
+  --orbit-radius: 160px;
+  animation: orbitPlanet 12s linear infinite reverse;
+}
+
+.planet-orbit-3 {
+  --orbit-radius: 200px;
+  animation: orbitPlanet 16s linear infinite;
+}
+
+/* Twinkling stars */
+.star {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.star:nth-child(even) {
+  animation-delay: 1s;
+}
+
+.star:nth-child(3n) {
+  animation-delay: 0.5s;
+}
+
+.star:nth-child(4n) {
+  animation-delay: 1.5s;
+}
+
+/* Floating particles */
+.cosmic-particle {
+  animation: floatUp 8s linear infinite;
+}
+
+.cosmic-particle:nth-child(2n) {
+  animation-delay: 2s;
+}
+
+.cosmic-particle:nth-child(3n) {
+  animation-delay: 4s;
+}
+
+.cosmic-particle:nth-child(4n) {
+  animation-delay: 6s;
+}
+
+/* Glowing effects */
+.glow-pulse {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Nebula background */
+.nebula-bg {
+  background: linear-gradient(-45deg, #1e1b4b, #312e81, #1e40af, #1e3a8a);
+  background-size: 400% 400%;
+  animation: nebula 15s ease infinite;
+}
+
+/* Card hover effects */
+.galaxy-card {
+  transition: all 0.3s ease;
+}
+
+.galaxy-card:hover {
+  animation: cardHover 0.3s ease forwards;
+}
+
+/* Text shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 3s infinite;
+}
