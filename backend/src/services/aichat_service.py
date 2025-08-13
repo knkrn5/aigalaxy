@@ -30,7 +30,6 @@ class aichatservice:
             # print(chunk, end="\n\n")
             if chunk.choices[0].delta.content is not None:
                 yield f"data: {chunk.choices[0].delta.content}\n"
-                # yield {chunk.choices[0].delta.content}
                 # await asyncio.sleep(0.01)
 
         # yield "data: [DONE]\n\n"

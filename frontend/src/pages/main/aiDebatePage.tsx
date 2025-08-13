@@ -81,40 +81,36 @@ console.log(greet("Pluto"));
       body: JSON.stringify({ question: inputvalue }),
     }).then((response) => {
 
-      const responseText = response.text()
-      responseText.then((text) => {
-        setAIResponse(text);
-        setIsFetching(false);
-      });
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
 
-      // const reader = response.body?.getReader();
-      // const decoder = new TextDecoder("utf-8");
+      function readStream() {
+        reader?.read().then(({ value, done }) => {
+          if (done) {
+            setIsFetching(false);
+            return;
+          }
+          const chunk = decoder.decode(value);
 
-      // function readStream() {
-      //   reader?.read().then(({ value, done }) => {
-      //     if (done) {
-      //       setIsFetching(false);
-      //       return;
-      //     }
-      //     const chunk = decoder.decode(value);
+          const lines = chunk.split("\n");
 
-      //     const lines = chunk.split("\n\n");
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const message = line.slice(6);
+              setAIResponse((prev) => prev + message);
+            }
+          }
 
-      //     for (const line of lines) {
-      //       if (line.startsWith("data: ")) {
-      //         const message = line.slice(6);
-      //         setAIResponse((prev) => prev + message);
-      //       }
-      //     }
+          readStream();
+        });
 
-      //     readStream();
-      //   });
-
-      //   setinputvalue("");
-      // }
-      // readStream();
-
+        setinputvalue("");
+      }
+      readStream();
     });
+
+
+
   };
 
   return (
