@@ -8,8 +8,8 @@ router = APIRouter()
 
 
 @router.post("/aichat-res-manu")
-def aichat(question: str = Body(embed=True, min_length=1)):
-    res = aichatservice.aichatManu(question)
+def aichat(question: str = Body(embed=True, min_length=1), model: str = Body(embed=True, min_length=1)):
+    res = aichatservice.aichatManu(question, model)
 
     def streamer():
         for item in res:

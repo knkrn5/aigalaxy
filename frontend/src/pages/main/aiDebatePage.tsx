@@ -31,41 +31,41 @@ export default function AiDebatePage() {
     setAIResponse("");
     setIsFetching(true);
 
-    // fetch(`${BACKEND_URL}/aichats/aichat-res`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ question: inputvalue }),
-    // }).then((response) => {
+   /*  fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: inputvalue, model: selectedModel }),
+    }).then((response) => {
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
 
-    //   const reader = response.body?.getReader();
-    //   const decoder = new TextDecoder("utf-8");
+      function readStream() {
+        reader?.read().then(({ value, done }) => {
+          if (done) {
+            setIsFetching(false);
+            return;
+          }
+          const chunk = decoder.decode(value);
 
-    //   function readStream() {
-    //     reader?.read().then(({ value, done }) => {
-    //       if (done) {
-    //         setIsFetching(false);
-    //         return;
-    //       }
-    //       const chunk = decoder.decode(value);
+          const lines = chunk.split("\n");
 
-    //       const lines = chunk.split("\n");
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              // const message = line.slice(6);
+              const message = line.replace(/^data: /, "");
+              setAIResponse((prev) => prev + message);
+            }
+          }
 
-    //       for (const line of lines) {
-    //         if (line.startsWith("data: ")) {
-    //           const message = line.slice(6);
-    //           setAIResponse((prev) => prev + message);
-    //         }
-    //       }
+          readStream();
+        });
 
-    //       readStream();
-    //     });
-
-    //     setinputvalue("");
-    //   }
-    //   readStream();
-    // });
+        setinputvalue("");
+      }
+      readStream();
+    }); */
 
     const evtSource = new EventSource(
       `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}&model=${selectedModel}`
@@ -108,7 +108,13 @@ export default function AiDebatePage() {
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20 mb-8">
           <div className="mb-8">
             {/* model selection */}
-            {["qwen/qwq-32b", "nvidia/llama-3.1-nemotron-70b-instruct", "google/gemma-3-1b-it", "openai/gpt-oss-20b", "sarvamai/sarvam-m"].map((model, i) => {
+            {[
+              "qwen/qwq-32b",
+              "nvidia/llama-3.1-nemotron-70b-instruct",
+              "google/gemma-3-1b-it",
+              "openai/gpt-oss-20b",
+              "sarvamai/sarvam-m",
+            ].map((model, i) => {
               return (
                 <label key={i} className="inline-flex items-center mr-4">
                   <input
