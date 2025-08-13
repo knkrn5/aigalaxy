@@ -10,6 +10,7 @@ export default function AiDebatePage() {
   const [aiResponse, setAIResponse] = useState<string>("");
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [inputvalue, setinputvalue] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("");
 
   const html = "<h1>" + "hii how are u" + "</h1>";
 
@@ -67,11 +68,10 @@ export default function AiDebatePage() {
     // });
 
     const evtSource = new EventSource(
-      `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}`
+      `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}&model=${selectedModel}`
     );
 
     evtSource.onmessage = (e) => {
-      console.log(e)
       if (e.data === "[DONE]") {
         evtSource.close();
         setIsFetching(false);
@@ -80,11 +80,14 @@ export default function AiDebatePage() {
     };
 
     evtSource.onerror = (err) => {
-      console.error("EventSource failed:", err);
+      setAIResponse(
+        `EventSource failed: ${
+          err instanceof Error ? err.message : JSON.stringify(err)
+        }`
+      );
       evtSource.close();
       setIsFetching(false);
     };
-
   };
 
   return (
@@ -103,9 +106,24 @@ export default function AiDebatePage() {
         {/* Main Content Card */}
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20 mb-8">
           <div className="mb-8">
+            {/* model selection */}
+            {["qwen/qwq-32b", "llama", "opnai", "gemini"].map((model, i) => {
+              return (
+                <label key={i} className="inline-flex items-center mr-4">
+                  <input
+                    type="radio"
+                    name="model"
+                    value={model}
+                    className="mr-2"
+                    checked={selectedModel === model}
+                    onChange={() => setSelectedModel(model)}
+                  />
+                  {model}
+                </label>
+              );
+            })}
             {/* input field */}
-            <input
-              type="text"
+            <textarea
               placeholder="Ask a question"
               className="w-full bg-transparent mb-5 border border-white/20 shadow-2xl shadow-amber-50 px-4 py-2 rounded-full text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50"
               value={inputvalue}

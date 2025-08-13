@@ -33,12 +33,12 @@ class aichatservice:
                 # await asyncio.sleep(0.01)
 
     @staticmethod
-    def aichatAuto(question: str):
+    def aichatAuto(question: str, model: str):
         if not question:
             raise ValueError("Question cannot be empty")
 
         completion = client.chat.completions.create(
-            model="nvidia/llama-3.1-nemotron-70b-instruct",
+            model=model,
             messages=[{"role": "user", "content": question}],
             temperature=0.6,
             top_p=0.95,
