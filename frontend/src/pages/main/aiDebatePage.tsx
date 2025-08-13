@@ -75,6 +75,7 @@ export default function AiDebatePage() {
       if (e.data === "[DONE]") {
         evtSource.close();
         setIsFetching(false);
+        return;
       }
       setAIResponse((prev) => prev + e.data);
     };
@@ -107,7 +108,7 @@ export default function AiDebatePage() {
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20 mb-8">
           <div className="mb-8">
             {/* model selection */}
-            {["qwen/qwq-32b", "llama", "opnai", "gemini"].map((model, i) => {
+            {["qwen/qwq-32b", "nvidia/llama-3.1-nemotron-70b-instruct", "google/gemma-3-1b-it", "openai/gpt-oss-20b", "sarvamai/sarvam-m"].map((model, i) => {
               return (
                 <label key={i} className="inline-flex items-center mr-4">
                   <input
