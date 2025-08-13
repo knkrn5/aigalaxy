@@ -11,7 +11,7 @@ client = OpenAI(
 
 class aichatservice:
     @staticmethod
-    def aichat(question: str):
+    def aichatManu(question: str):
         if not question:
             raise ValueError("Question cannot be empty")
 
@@ -32,4 +32,24 @@ class aichatservice:
                 yield f"data: {chunk.choices[0].delta.content}\n"
                 # await asyncio.sleep(0.01)
 
-        # yield "data: [DONE]\n\n"
+    @staticmethod
+    def aichatAuto(question: str):
+        if not question:
+            raise ValueError("Question cannot be empty")
+
+        completion = client.chat.completions.create(
+            model="nvidia/llama-3.1-nemotron-70b-instruct",
+            messages=[{"role": "user", "content": question}],
+            temperature=0.6,
+            top_p=0.95,
+            max_tokens=4096,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stream=True,
+        )
+
+        for chunk in completion:
+            if chunk.choices[0].delta.content is not None:
+                yield f"data: {chunk.choices[0].delta.content}\n\n"
+
+        yield "data: [DONE]\n\n"

@@ -7,18 +7,18 @@ from ..services.aichat_service import aichatservice
 router = APIRouter()
 
 
-@router.post("/aichat-res")
+@router.post("/aichat-res-manu")
 def aichat(question: str = Body(embed=True, min_length=1)):
-    res = aichatservice.aichat(question)
+    res = aichatservice.aichatManu(question)
     def streamer():
         for item in res:
             yield ", ".join(item) if isinstance(item, set) else str(item)
     return StreamingResponse(streamer(), media_type="text/event-stream")
 
 
-@router.get("/aichat-res")
+@router.get("/aichat-res-auto")
 def aichat(question: str = Query(..., min_length=1)):
     return StreamingResponse(
-        aichatservice.aichat(question),
+        aichatservice.aichatAuto(question),
         media_type="text/event-stream",
     )

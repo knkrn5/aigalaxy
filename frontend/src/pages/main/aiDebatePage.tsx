@@ -12,57 +12,14 @@ export default function AiDebatePage() {
   const [inputvalue, setinputvalue] = useState<string>("");
 
   const html = "<h1>" + "hii how are u" + "</h1>";
-  const markdown = `
-# Hi, *Pluto*!
 
-## Subheading Example
-This is a **bold** statement, and here is some _italic text_.  
-We can also use ~~strikethrough~~.
-
-> A blockquote example:  
-> "The universe is vast and full of mysteries."
-
-### Unordered List
-- Mercury
-- Venus
-- Earth
-- Mars
-
-### Ordered List
-1. Jupiter
-2. Saturn
-3. Uranus
-4. Neptune
-
-### Inline Code
-Here’s some inline code: \`console.log("Hello Pluto");\`
-
-### Code Block
-\`\`\`js
-function greet(name) {
-  return \`Hello, \${name}!\`;
-}
-console.log(greet("Pluto"));
-\`\`\`
-
-### Table Example
-| Planet   | Type         | Distance from Sun (AU) |
-|----------|--------------|------------------------|
-| Mercury  | Terrestrial  | 0.39                   |
-| Venus    | Terrestrial  | 0.72                   |
-| Earth    | Terrestrial  | 1.00                   |
-| Pluto    | Dwarf Planet | 39.48                  |
-
----
-*This concludes our Markdown demo.*
-`;
   const md = `Since you didn't specify a particular theme or type for the 5-list, I'll provide five different lists across various themes. Pick the one that interests you the most, or let me know if you'd like me to generate new lists based on a specific theme of your choice! 
   ### 1. Fiction Book Genres 
-  - 1. Fantasy 
-  - 2. Science Fiction 
-  - 3. Mystery 
-  - 4. Historical Fiction 
-  - 5. Romance `;
+  - 1. Fantasy
+  - 2. Science Fiction
+  - 3. Mystery
+  - 4. Historical Fiction
+  - 5. Romance`;
 
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
@@ -73,43 +30,60 @@ console.log(greet("Pluto"));
     setAIResponse("");
     setIsFetching(true);
 
-    fetch(`${BACKEND_URL}/aichats/aichat-res`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question: inputvalue }),
-    }).then((response) => {
+    // fetch(`${BACKEND_URL}/aichats/aichat-res`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ question: inputvalue }),
+    // }).then((response) => {
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
+    //   const reader = response.body?.getReader();
+    //   const decoder = new TextDecoder("utf-8");
 
-      function readStream() {
-        reader?.read().then(({ value, done }) => {
-          if (done) {
-            setIsFetching(false);
-            return;
-          }
-          const chunk = decoder.decode(value);
+    //   function readStream() {
+    //     reader?.read().then(({ value, done }) => {
+    //       if (done) {
+    //         setIsFetching(false);
+    //         return;
+    //       }
+    //       const chunk = decoder.decode(value);
 
-          const lines = chunk.split("\n");
+    //       const lines = chunk.split("\n");
 
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const message = line.slice(6);
-              setAIResponse((prev) => prev + message);
-            }
-          }
+    //       for (const line of lines) {
+    //         if (line.startsWith("data: ")) {
+    //           const message = line.slice(6);
+    //           setAIResponse((prev) => prev + message);
+    //         }
+    //       }
 
-          readStream();
-        });
+    //       readStream();
+    //     });
 
-        setinputvalue("");
+    //     setinputvalue("");
+    //   }
+    //   readStream();
+    // });
+
+    const evtSource = new EventSource(
+      `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}`
+    );
+
+    evtSource.onmessage = (e) => {
+      console.log(e)
+      if (e.data === "[DONE]") {
+        evtSource.close();
+        setIsFetching(false);
       }
-      readStream();
-    });
+      setAIResponse((prev) => prev + e.data);
+    };
 
-
+    evtSource.onerror = (err) => {
+      console.error("EventSource failed:", err);
+      evtSource.close();
+      setIsFetching(false);
+    };
 
   };
 
