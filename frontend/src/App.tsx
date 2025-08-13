@@ -27,7 +27,7 @@ function App() {
         }
 
         if (!isAuthenticated) {
-          const pass = prompt("Enter password to access the app");
+          const pass = prompt("Enter 'iloveai' to access the app");
           if (!pass) {
             setIsAuthenticated(false);
             return;
