@@ -11,6 +11,59 @@ export default function AiDebatePage() {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [inputvalue, setinputvalue] = useState<string>("");
 
+  const html = "<h1>" + "hii how are u" + "</h1>";
+  const markdown = `
+# Hi, *Pluto*!
+
+## Subheading Example
+This is a **bold** statement, and here is some _italic text_.  
+We can also use ~~strikethrough~~.
+
+> A blockquote example:  
+> "The universe is vast and full of mysteries."
+
+### Unordered List
+- Mercury
+- Venus
+- Earth
+- Mars
+
+### Ordered List
+1. Jupiter
+2. Saturn
+3. Uranus
+4. Neptune
+
+### Inline Code
+Here’s some inline code: \`console.log("Hello Pluto");\`
+
+### Code Block
+\`\`\`js
+function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+console.log(greet("Pluto"));
+\`\`\`
+
+### Table Example
+| Planet   | Type         | Distance from Sun (AU) |
+|----------|--------------|------------------------|
+| Mercury  | Terrestrial  | 0.39                   |
+| Venus    | Terrestrial  | 0.72                   |
+| Earth    | Terrestrial  | 1.00                   |
+| Pluto    | Dwarf Planet | 39.48                  |
+
+---
+*This concludes our Markdown demo.*
+`;
+  const md = `Since you didn't specify a particular theme or type for the 5-list, I'll provide five different lists across various themes. Pick the one that interests you the most, or let me know if you'd like me to generate new lists based on a specific theme of your choice! 
+  ### 1. Fiction Book Genres 
+  - 1. Fantasy 
+  - 2. Science Fiction 
+  - 3. Mystery 
+  - 4. Historical Fiction 
+  - 5. Romance `;
+
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
       setAIResponse("Please enter a valid question.");
@@ -27,67 +80,40 @@ export default function AiDebatePage() {
       },
       body: JSON.stringify({ question: inputvalue }),
     }).then((response) => {
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
 
-      readStream();
+      const responseText = response.text()
+      responseText.then((text) => {
+        setAIResponse(text);
+        setIsFetching(false);
+      });
 
-      function readStream() {
-        reader?.read().then(({ value, done }) => {
-          if (done) {
-            setIsFetching(false);
-            return;
-          }
-          const chunk = decoder.decode(value);
+      // const reader = response.body?.getReader();
+      // const decoder = new TextDecoder("utf-8");
 
-          const lines = chunk.split("\n\n");
+      // function readStream() {
+      //   reader?.read().then(({ value, done }) => {
+      //     if (done) {
+      //       setIsFetching(false);
+      //       return;
+      //     }
+      //     const chunk = decoder.decode(value);
 
-          lines.forEach((line) => {
-            if (line.startsWith("data: ")) {
-              const message = line.slice(6);
-              setAIResponse((prev) => prev + message);
-            }
-          });
+      //     const lines = chunk.split("\n\n");
 
-          // for (const line of lines) {
-          //   if (line.startsWith("data: ")) {
-          //     const message = line.slice(6);
-          //     setAIResponse((prev) => prev + message);
-          //   }
-          // }
+      //     for (const line of lines) {
+      //       if (line.startsWith("data: ")) {
+      //         const message = line.slice(6);
+      //         setAIResponse((prev) => prev + message);
+      //       }
+      //     }
 
-          readStream();
-        });
+      //     readStream();
+      //   });
 
+      //   setinputvalue("");
+      // }
+      // readStream();
 
-        // const encodedQuestion = encodeURIComponent(inputvalue);
-        // const eventSource = new EventSource(
-        //   `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
-        // );
-
-        // eventSource.onopen = () => {
-        //   console.log("SSE connection opened");
-        // };
-
-        // eventSource.onmessage = (event) => {
-        //   if (event.data === "[DONE]") {
-        //     eventSource.close();
-        //     setIsFetching(false);
-        //     return;
-        //   }
-        //   setAIResponse((prev) => prev + event.data);
-        // };
-
-        // eventSource.onerror = (error) => {
-        //   console.error("SSE error:", error);
-        //   setAIResponse("Error: Failed to get AI response. Please try again.");
-        //   eventSource.close();
-        //   setIsFetching(false);
-        // };
-
-        // Clear input after sending
-        setinputvalue("");
-      }
     });
   };
 
@@ -143,8 +169,8 @@ export default function AiDebatePage() {
                   <span>AI is thinking...</span>
                 </div>
                 {aiResponse && (
-                  <div className="text-left whitespace-pre-wrap bg-gray-800/30 rounded-lg p-4 mt-4">
-                    {aiResponse}
+                  <div className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4">
+                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
                   </div>
                 )}
               </div>
@@ -156,9 +182,14 @@ export default function AiDebatePage() {
                     human curiosity in the ultimate debate arena.
                   </p>
                 ) : (
-                  <div className="text-left whitespace-pre-wrap prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 ">
+                  <div className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 ">
                     <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                    {/* <ReactMarkdown>{md}</ReactMarkdown> */}
                   </div>
+                  // <div
+                  //   className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 "
+                  //   dangerouslySetInnerHTML={{ __html: aiResponse }}
+                  // />
                 )}
               </div>
             )}

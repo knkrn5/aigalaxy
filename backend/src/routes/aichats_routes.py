@@ -10,7 +10,10 @@ router = APIRouter()
 @router.post("/aichat-res")
 def aichat(question: str = Body(embed=True, min_length=1)):
     res = aichatservice.aichat(question)
-    return StreamingResponse(res, media_type="text/event-stream")
+    def streamer():
+        for item in res:
+            yield ", ".join(item) if isinstance(item, set) else str(item)
+    return StreamingResponse(streamer(), media_type="text/event-stream")
 
 
 # @router.get("/aichat-res")
