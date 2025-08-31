@@ -1,5 +1,5 @@
 import { useState } from "react";
-import './authLogin.css';
+import './appAccessLogin.css';
 
 interface AuthLoginProps {
   onAuthentication: (password: string) => void;

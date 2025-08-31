@@ -4,8 +4,8 @@ import Home from "./pages/home/homePage";
 import AiDebatePage from "./pages/main/aiDebatePage";
 import axios from "axios";
 import Loading from "./components/ui/loading";
-import AuthDenied from "./pages/auth/authDenied";
-import AuthLogin from "./pages/auth/authLogin";
+import AppAccessDenied from "./pages/appAccess/appAccessDenied";
+import AppAccessLogin from "./pages/appAccess/appAccessLogin";
 import PageNotFound from "./pages/pageNotFound/pageNotFound";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -69,7 +69,7 @@ function App() {
 
   if (showAuthLogin && !isAuthenticated) {
     return (
-      <AuthLogin 
+      <AppAccessLogin
         onAuthentication={handleAuthentication}
         isLoading={authLoading}
         error={authError}
@@ -78,7 +78,7 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return <AuthDenied />;
+    return <AppAccessDenied />;
   }
 
   return (
@@ -88,7 +88,6 @@ function App() {
 
       {/* Catch-all route for 404 pages */}
       <Route path="*" element={<PageNotFound />} />
-
     </Routes>
   );
 }

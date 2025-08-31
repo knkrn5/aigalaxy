@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { FaRepeat } from "react-icons/fa6";
-import "./authDenied.css";
+import "./appAccessDenied.css";
 
-export default function AuthDenied() {
+export default function AccessDenied() {
   const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
