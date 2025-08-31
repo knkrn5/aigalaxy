@@ -32,18 +32,18 @@ export default function AiDebatePage() {
     setAIResponse("");
     setIsFetching(true);
 
-    // fetch(`${BACKEND_URL}/aichats/aichat-res-direct`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ question: inputvalue, model: selectedModel }),
-    // })
-    //   .then((response) => response.text())
-    //   .then((data) => setAIResponse(data))
-    //   .finally(() => setIsFetching(false));
+    fetch(`${BACKEND_URL}/aichats/aichat-res-direct`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: inputvalue, model: selectedModel }),
+    })
+      .then((response) => response.text())
+      .then((data) => setAIResponse(data))
+      .finally(() => setIsFetching(false));
 
-    fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
+    /* fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export default function AiDebatePage() {
         setinputvalue("");
       }
       readStream();
-    });
+    }); */
 
     /* const evtSource = new EventSource(
       `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}&model=${selectedModel}`

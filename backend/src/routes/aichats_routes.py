@@ -28,9 +28,9 @@ def aichat(
     )
 
 
-# @router.post("/aichat-res-direct")
-# def aichat(question: str = Body(embed=True, min_length=1), model: str = Body(embed=True, min_length=1)):
-#     res = aichatservice.aichatDirect(question, model)
+@router.post("/aichat-res-direct")
+def aichat(question: str = Body(embed=True, min_length=1), model: str = Body(embed=True, min_length=1)):
+    res = aichatservice.aichatDirect(question, model)
 
 
-#     return Response(res, media_type="application/json")
+    return Response(res, media_type="application/json")
