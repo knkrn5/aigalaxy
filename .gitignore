@@ -41,3 +41,7 @@ build
 
 # py-Packages
 .venv/
+
+#other
+run.sh
+Procfile
