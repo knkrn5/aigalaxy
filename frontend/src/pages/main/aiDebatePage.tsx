@@ -11,16 +11,17 @@ export default function AiDebatePage() {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [inputvalue, setinputvalue] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  // const [bufferedResponse, setBufferedResponse] = useState("");
 
-  const html = "<h1>" + "hii how are u" + "</h1>";
+  // const html = "<h1>" + "hii how are u" + "</h1>";
 
-  const md = `Since you didn't specify a particular theme or type for the 5-list, I'll provide five different lists across various themes. Pick the one that interests you the most, or let me know if you'd like me to generate new lists based on a specific theme of your choice! 
-  ### 1. Fiction Book Genres 
-  - 1. Fantasy
-  - 2. Science Fiction
-  - 3. Mystery
-  - 4. Historical Fiction
-  - 5. Romance`;
+  // const md = `Since you didn't specify a particular theme or type for the 5-list, I'll provide five different lists across various themes. Pick the one that interests you the most, or let me know if you'd like me to generate new lists based on a specific theme of your choice!
+  // ### 1. Fiction Book Genres
+  // - 1. Fantasy
+  // - 2. Science Fiction
+  // - 3. Mystery
+  // - 4. Historical Fiction
+  // - 5. Romance`;
 
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
@@ -31,7 +32,18 @@ export default function AiDebatePage() {
     setAIResponse("");
     setIsFetching(true);
 
-   /*  fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
+    // fetch(`${BACKEND_URL}/aichats/aichat-res-direct`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ question: inputvalue, model: selectedModel }),
+    // })
+    //   .then((response) => response.text())
+    //   .then((data) => setAIResponse(data))
+    //   .finally(() => setIsFetching(false));
+
+    fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,9 +77,9 @@ export default function AiDebatePage() {
         setinputvalue("");
       }
       readStream();
-    }); */
+    });
 
-    const evtSource = new EventSource(
+    /* const evtSource = new EventSource(
       `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}&model=${selectedModel}`
     );
 
@@ -78,6 +90,7 @@ export default function AiDebatePage() {
         return;
       }
       setAIResponse((prev) => prev + e.data);
+
     };
 
     evtSource.onerror = (err) => {
@@ -88,7 +101,7 @@ export default function AiDebatePage() {
       );
       evtSource.close();
       setIsFetching(false);
-    };
+    }; */
   };
 
   return (
@@ -164,7 +177,10 @@ export default function AiDebatePage() {
                   <span>AI is thinking...</span>
                 </div>
                 {aiResponse && (
-                  <div className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4">
+                  <div
+                    className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4"
+                    style={{ whiteSpace: "pre-wrap" }}
+                  >
                     <ReactMarkdown>{aiResponse}</ReactMarkdown>
                   </div>
                 )}
@@ -177,7 +193,10 @@ export default function AiDebatePage() {
                     human curiosity in the ultimate debate arena.
                   </p>
                 ) : (
-                  <div className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 ">
+                  <div
+                    className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 "
+                    style={{ whiteSpace: "pre-wrap" }}
+                  >
                     <ReactMarkdown>{aiResponse}</ReactMarkdown>
                     {/* <ReactMarkdown>{md}</ReactMarkdown> */}
                   </div>
