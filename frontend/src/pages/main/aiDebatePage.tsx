@@ -10,6 +10,18 @@ export default function AiDebatePage() {
   const [aiResponse, setAIResponse] = useState<string>("");
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [inputvalue, setinputvalue] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  // const [bufferedResponse, setBufferedResponse] = useState("");
+
+  // const html = "<h1>" + "hii how are u" + "</h1>";
+
+  // const md = `Since you didn't specify a particular theme or type for the 5-list, I'll provide five different lists across various themes. Pick the one that interests you the most, or let me know if you'd like me to generate new lists based on a specific theme of your choice!
+  // ### 1. Fiction Book Genres
+  // - 1. Fantasy
+  // - 2. Science Fiction
+  // - 3. Mystery
+  // - 4. Historical Fiction
+  // - 5. Romance`;
 
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
@@ -20,17 +32,26 @@ export default function AiDebatePage() {
     setAIResponse("");
     setIsFetching(true);
 
-    fetch(`${BACKEND_URL}/aichats/aichat-res`, {
+    fetch(`${BACKEND_URL}/aichats/aichat-res-direct`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ question: inputvalue }),
+      body: JSON.stringify({ question: inputvalue, model: selectedModel }),
+    })
+      .then((response) => response.text())
+      .then((data) => setAIResponse(data))
+      .finally(() => setIsFetching(false));
+
+    /* fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: inputvalue, model: selectedModel }),
     }).then((response) => {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder("utf-8");
-
-      readStream();
 
       function readStream() {
         reader?.read().then(({ value, done }) => {
@@ -40,55 +61,47 @@ export default function AiDebatePage() {
           }
           const chunk = decoder.decode(value);
 
-          const lines = chunk.split("\n\n");
+          const lines = chunk.split("\n");
 
-          lines.forEach((line) => {
+          for (const line of lines) {
             if (line.startsWith("data: ")) {
-              const message = line.slice(6);
+              // const message = line.slice(6);
+              const message = line.replace(/^data: /, "");
               setAIResponse((prev) => prev + message);
             }
-          });
-
-          // for (const line of lines) {
-          //   if (line.startsWith("data: ")) {
-          //     const message = line.slice(6);
-          //     setAIResponse((prev) => prev + message);
-          //   }
-          // }
+          }
 
           readStream();
         });
 
-
-        // const encodedQuestion = encodeURIComponent(inputvalue);
-        // const eventSource = new EventSource(
-        //   `${BACKEND_URL}/aichats/aichat-res?question=${encodedQuestion}`
-        // );
-
-        // eventSource.onopen = () => {
-        //   console.log("SSE connection opened");
-        // };
-
-        // eventSource.onmessage = (event) => {
-        //   if (event.data === "[DONE]") {
-        //     eventSource.close();
-        //     setIsFetching(false);
-        //     return;
-        //   }
-        //   setAIResponse((prev) => prev + event.data);
-        // };
-
-        // eventSource.onerror = (error) => {
-        //   console.error("SSE error:", error);
-        //   setAIResponse("Error: Failed to get AI response. Please try again.");
-        //   eventSource.close();
-        //   setIsFetching(false);
-        // };
-
-        // Clear input after sending
         setinputvalue("");
       }
-    });
+      readStream();
+    }); */
+
+    /* const evtSource = new EventSource(
+      `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}&model=${selectedModel}`
+    );
+
+    evtSource.onmessage = (e) => {
+      if (e.data === "[DONE]") {
+        evtSource.close();
+        setIsFetching(false);
+        return;
+      }
+      setAIResponse((prev) => prev + e.data);
+
+    };
+
+    evtSource.onerror = (err) => {
+      setAIResponse(
+        `EventSource failed: ${
+          err instanceof Error ? err.message : JSON.stringify(err)
+        }`
+      );
+      evtSource.close();
+      setIsFetching(false);
+    }; */
   };
 
   return (
@@ -107,9 +120,30 @@ export default function AiDebatePage() {
         {/* Main Content Card */}
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20 mb-8">
           <div className="mb-8">
+            {/* model selection */}
+            {[
+              "qwen/qwq-32b",
+              "nvidia/llama-3.1-nemotron-70b-instruct",
+              "google/gemma-3-1b-it",
+              "openai/gpt-oss-20b",
+              "sarvamai/sarvam-m",
+            ].map((model, i) => {
+              return (
+                <label key={i} className="inline-flex items-center mr-4">
+                  <input
+                    type="radio"
+                    name="model"
+                    value={model}
+                    className="mr-2"
+                    checked={selectedModel === model}
+                    onChange={() => setSelectedModel(model)}
+                  />
+                  {model}
+                </label>
+              );
+            })}
             {/* input field */}
-            <input
-              type="text"
+            <textarea
               placeholder="Ask a question"
               className="w-full bg-transparent mb-5 border border-white/20 shadow-2xl shadow-amber-50 px-4 py-2 rounded-full text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50"
               value={inputvalue}
@@ -143,8 +177,11 @@ export default function AiDebatePage() {
                   <span>AI is thinking...</span>
                 </div>
                 {aiResponse && (
-                  <div className="text-left whitespace-pre-wrap bg-gray-800/30 rounded-lg p-4 mt-4">
-                    {aiResponse}
+                  <div
+                    className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4"
+                    style={{ whiteSpace: "pre-wrap" }}
+                  >
+                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
                   </div>
                 )}
               </div>
@@ -156,9 +193,17 @@ export default function AiDebatePage() {
                     human curiosity in the ultimate debate arena.
                   </p>
                 ) : (
-                  <div className="text-left whitespace-pre-wrap prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 ">
+                  <div
+                    className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 "
+                    style={{ whiteSpace: "pre-wrap" }}
+                  >
                     <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                    {/* <ReactMarkdown>{md}</ReactMarkdown> */}
                   </div>
+                  // <div
+                  //   className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 "
+                  //   dangerouslySetInnerHTML={{ __html: aiResponse }}
+                  // />
                 )}
               </div>
             )}
