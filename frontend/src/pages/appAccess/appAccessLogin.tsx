@@ -81,7 +81,7 @@ export default function AuthLogin({ onAuthentication, isLoading = false, error }
                 Welcome to AI Galaxy
               </span>
             </h1>
-            <p className="text-gray-300 text-lg">Enter your access code to explore the universe</p>
+            <p className="text-gray-300 text-lg">Enter "iloveai" to explore the AI universe</p>
           </div>
 
           {/* Form */}
