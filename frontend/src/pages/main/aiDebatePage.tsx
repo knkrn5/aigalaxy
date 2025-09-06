@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { NavLink } from "react-router";
@@ -10,7 +10,7 @@ export default function AiDebatePage() {
   const [aiResponse, setAIResponse] = useState<string>("");
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [inputvalue, setinputvalue] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("qwen/qwq-32b");
   // const [bufferedResponse, setBufferedResponse] = useState("");
 
   const md = `# Sample Markdown
@@ -25,7 +25,7 @@ This is a **bold** text and this is an *italic* text.`;
     setAIResponse("");
     setIsFetching(true);
 
-    fetch(`${BACKEND_URL}/aichats/aichat-res-direct`, {
+    /* fetch(`${BACKEND_URL}/aichats/aichat-res-direct`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,9 +37,9 @@ This is a **bold** text and this is an *italic* text.`;
         setAIResponse(data);
         console.log(data);
       })
-      .finally(() => setIsFetching(false));
+      .finally(() => setIsFetching(false)); */
 
-    /* fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
+    fetch(`${BACKEND_URL}/aichats/aichat-res-manu`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +73,7 @@ This is a **bold** text and this is an *italic* text.`;
         setinputvalue("");
       }
       readStream();
-    }); */
+    });
 
     /* const evtSource = new EventSource(
       `${BACKEND_URL}/aichats/aichat-res-auto?question=${inputvalue}&model=${selectedModel}`
@@ -99,6 +99,10 @@ This is a **bold** text and this is an *italic* text.`;
       setIsFetching(false);
     }; */
   };
+
+  useEffect(() => {
+    console.log(aiResponse);
+  }, [aiResponse]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-6">
