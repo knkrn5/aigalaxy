@@ -13,6 +13,9 @@ export default function AiDebatePage() {
   const [selectedModel, setSelectedModel] = useState<string>("");
   // const [bufferedResponse, setBufferedResponse] = useState("");
 
+  const md = `# Sample Markdown
+This is a **bold** text and this is an *italic* text.`;
+
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
       setAIResponse("Please enter a valid question.");
@@ -205,31 +208,6 @@ export default function AiDebatePage() {
             >
               Go Home
             </NavLink>
-          </div>
-        </div>
-
-        {/* Feature Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mt-12">
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-lg flex items-center justify-center mb-4 mx-auto">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-white font-semibold mb-2">Lightning Fast</h3>
-            <p className="text-gray-400 text-sm">
-              Real-time AI responses powered by cutting-edge language models
-            </p>
           </div>
         </div>
       </div>

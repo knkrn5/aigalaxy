@@ -29,8 +29,8 @@ class aichatservice:
         for chunk in completion:
             # print(chunk, end="\n\n")
             if chunk.choices[0].delta.content is not None:
+                print(chunk.choices[0].delta.content, end="")
                 yield f"data: {chunk.choices[0].delta.content}\n"
-                # await asyncio.sleep(0.01)
 
     @staticmethod
     def aichatAuto(question: str, model: str):

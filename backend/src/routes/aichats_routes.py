@@ -8,14 +8,13 @@ router = APIRouter()
 
 
 @router.post("/aichat-res-manu")
-def aichat(question: str = Body(embed=True, min_length=1), model: str = Body(embed=True, min_length=1)):
+def aichat(
+    question: str = Body(embed=True, min_length=1),
+    model: str = Body(embed=True, min_length=1),
+):
     res = aichatservice.aichatManu(question, model)
 
-    def streamer():
-        for item in res:
-            yield ", ".join(item) if isinstance(item, set) else str(item)
-
-    return StreamingResponse(streamer(), media_type="text/event-stream")
+    return StreamingResponse(res, media_type="text/event-stream")
 
 
 @router.get("/aichat-res-auto")
@@ -29,8 +28,10 @@ def aichat(
 
 
 @router.post("/aichat-res-direct")
-def aichat(question: str = Body(embed=True, min_length=1), model: str = Body(embed=True, min_length=1)):
+def aichat(
+    question: str = Body(embed=True, min_length=1),
+    model: str = Body(embed=True, min_length=1),
+):
     res = aichatservice.aichatDirect(question, model)
-
 
     return Response(res, media_type="application/json")
