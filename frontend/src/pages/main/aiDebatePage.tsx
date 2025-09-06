@@ -13,9 +13,6 @@ export default function AiDebatePage() {
   const [selectedModel, setSelectedModel] = useState<string>("qwen/qwq-32b");
   // const [bufferedResponse, setBufferedResponse] = useState("");
 
-  const md = `# Sample Markdown
-This is a **bold** text and this is an *italic* text.`;
-
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
       setAIResponse("Please enter a valid question.");
@@ -57,7 +54,7 @@ This is a **bold** text and this is an *italic* text.`;
           }
           const chunk = decoder.decode(value);
 
-          const lines = chunk.split("\n");
+          const lines = chunk.split("/n");
 
           for (const line of lines) {
             if (line.startsWith("data: ")) {
