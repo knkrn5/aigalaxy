@@ -107,6 +107,46 @@ export default function AiDebatePage() {
     }; */
   };
 
+  const markdownComponents = {
+    p: ({ children }) => (
+      <p className="mb-3 leading-relaxed text-gray-200">{children}</p>
+    ),
+    ul: ({ children }) => (
+      <ul className="mb-4 space-y-1 text-gray-200">{children}</ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="mb-4 space-y-1 text-gray-200 list-decimal list-inside">
+        {children}
+      </ol>
+    ),
+    li: ({ children }) => (
+      <li className="leading-relaxed text-gray-200 ml-4">{children}</li>
+    ),
+    h1: ({ children }) => (
+      <h1 className="text-2xl font-bold mb-4 text-white">{children}</h1>
+    ),
+    h2: ({ children }) => (
+      <h2 className="text-xl font-semibold mb-3 text-white">{children}</h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="text-lg font-semibold mb-2 text-white">{children}</h3>
+    ),
+    strong: ({ children }) => (
+      <strong className="font-semibold text-white">{children}</strong>
+    ),
+    em: ({ children }) => <em className="italic text-gray-300">{children}</em>,
+    code: ({ children }) => (
+      <code className="bg-gray-700 text-cyan-300 px-1 py-0.5 rounded text-sm">
+        {children}
+      </code>
+    ),
+    pre: ({ children }) => (
+      <pre className="bg-gray-700 text-cyan-300 p-4 rounded-lg mb-4 overflow-x-auto">
+        {children}
+      </pre>
+    ),
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-6">
       <div className="max-w-4xl mx-auto text-center">
@@ -180,12 +220,11 @@ export default function AiDebatePage() {
                   <span>AI is thinking...</span>
                 </div>
                 {aiResponse && (
-                  <div className="max-w-none text-left prose prose-invert bg-gray-800/30 rounded-lg p-6">
-                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                  <div className="text-left bg-gray-800/30 rounded-lg p-6 max-w-none">
+                    <ReactMarkdown components={markdownComponents}>
+                      {aiResponse}
+                    </ReactMarkdown>
                   </div>
-                  // <div className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 [&_li]:my-1 [&_p]:my-2">
-                  //   <ReactMarkdown>{aiResponse}</ReactMarkdown>
-                  // </div>
                 )}
               </div>
             ) : (
@@ -196,12 +235,15 @@ export default function AiDebatePage() {
                     human curiosity in the ultimate debate arena.
                   </p>
                 ) : (
-                  <div className="max-w-none text-left prose prose-invert bg-gray-800/30 rounded-lg p-6">
-                    <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                  <div className="text-left bg-gray-800/30 rounded-lg p-6 max-w-none">
+                    <ReactMarkdown components={markdownComponents}>
+                      {aiResponse}
+                    </ReactMarkdown>
                   </div>
-                  // <div className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 [&_li]:my-1 [&_p]:my-2">
-                  //   <ReactMarkdown>{aiResponse}</ReactMarkdown>
-                  // </div>
+                  // <div
+                  //   className="text-left prose prose-invert max-w-none bg-gray-800/30 rounded-lg p-4 "
+                  //   dangerouslySetInnerHTML={{ __html: aiResponse }}
+                  // />
                 )}
               </div>
             )}
