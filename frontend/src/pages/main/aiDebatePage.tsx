@@ -13,16 +13,6 @@ export default function AiDebatePage() {
   const [selectedModel, setSelectedModel] = useState<string>("");
   // const [bufferedResponse, setBufferedResponse] = useState("");
 
-  // const html = "<h1>" + "hii how are u" + "</h1>";
-
-  // const md = `Since you didn't specify a particular theme or type for the 5-list, I'll provide five different lists across various themes. Pick the one that interests you the most, or let me know if you'd like me to generate new lists based on a specific theme of your choice!
-  // ### 1. Fiction Book Genres
-  // - 1. Fantasy
-  // - 2. Science Fiction
-  // - 3. Mystery
-  // - 4. Historical Fiction
-  // - 5. Romance`;
-
   const handleGetAIResponse = (inputvalue: string) => {
     if (!inputvalue.trim()) {
       setAIResponse("Please enter a valid question.");
